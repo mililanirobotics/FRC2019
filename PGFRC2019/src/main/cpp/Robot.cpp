@@ -26,7 +26,7 @@ Robot::Robot():
 	solenoidThree(0,1),
 	solenoidFour(2, 3),
 	compressor(2),
-	stickOne(0),
+	stickOne(0), //Joystick one
 	stickTwo(1),
 	gamePad1(2)
 	{
