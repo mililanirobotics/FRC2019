@@ -9,13 +9,13 @@
 #include "ctre/Phoenix.h"
 #include "frc/WPILib.h"
 #include "frc/Compressor.h"
-
 #include <string>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
 
 class Robot : public frc::TimedRobot {
  public:
+  //Functions being initialized
   void RobotInit() override;
   void RobotPeriodic() override;
   void AutonomousInit() override;
@@ -26,10 +26,12 @@ class Robot : public frc::TimedRobot {
   void setFollowers();
 
  private:
+  //Constants
   const float WHEEL_CIRCUMFERENCE = 18.84955592153876;
   const double GEAR_RATIO = 1;
   const double TICKS_PER_ROTATION = 1;
   const int OFF_SET_DISTANCE = 400;
+
   //Talons
   TalonSRX LBack{10};
   TalonSRX LMiddle{14};

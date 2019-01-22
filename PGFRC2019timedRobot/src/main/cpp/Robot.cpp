@@ -93,7 +93,7 @@ void Robot::TeleopInit()
 
 void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 {
-  const double ROLLERPOWER = 0.3;
+  const double ROLLERPOWER = 0.3; //constant roller power to eject and intake
   double leftJoystickPower = -joystickL.GetY(); //Gets y value of left joystick
 	double rightJoystickPower = joystickR.GetY(); //Gets y value of right joystick
 	if (joystickL.GetRawButton(1) || joystickR.GetRawButton(1)) //Slowmode if triggers on either joysticks are pressed
