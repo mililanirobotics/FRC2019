@@ -6,7 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Robot.h"
-
+#include "networktables/NetworkTableInstance.h"
+#include "networktables/NetworkTableEntry.h"
+#include "networktables/NetworkTable.h"
 #include <iostream>
 
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -81,6 +83,7 @@ void Robot::AutonomousPeriodic() //Autonomous that runs periodically
 
 void Robot::TeleopInit() 
 {
+	//Motors
   RFront.ConfigPeakOutputForward(1.0, 10);
 	RFront.ConfigPeakOutputReverse(-1.0, 10); //Sets RFront to power range -1.0 to 1.0
 	RFront.SetNeutralMode(NeutralMode::Brake); //Brakes when power is 0
@@ -89,10 +92,17 @@ void Robot::TeleopInit()
 	LFront.SetNeutralMode(NeutralMode::Brake); //Brakes when power is 0
 	compressor.SetClosedLoopControl(true); //Opens compressor
 	setFollowers(); //Sets all other drive motors to follow RFront and LFront
+
+
 }
 
 void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 {
+	//Camera
+	auto inst = nt::NetworkTableInstance::GetDefault();
+	auto table = inst.GetTable("limelight");
+	
+	//Controller/Motor Power
   const double ROLLERPOWER = 0.3; //constant roller power to eject and intake
   double leftJoystickPower = -joystickL.GetY(); //Gets y value of left joystick
 	double rightJoystickPower = joystickR.GetY(); //Gets y value of right joystick
@@ -153,6 +163,29 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 		rollerTalon.Set(ControlMode::PercentOutput, 0); //Sets power to 0 when unattended
 	}
 
+	if (joystickR.GetRawButton(2)
+	{ //Alignment with camera
+  	double targetOffsetAngle_Horitzontal = table->GetNumber("tx",0.0);
+		std::cout << targetOffsetAngle_Horitzontal << std::endl;
+		if (targetOffsetAngle_Horitzontal > -1.0)
+		{
+    	RFront.Set(ControlMode::PercentOutput, 0.2);
+			LFront.Set(ControlMode::PercentOutput, -0.3);
+      std::cout << "Left" << std::endl;
+    }
+    else if (targetOffsetAngle_Horitzontal < 1.0)
+    {
+      RFront.Set(ControlMode::PercentOutput, 0.3);
+			LFront.Set(ControlMode::PercentOutput, -0.2);
+      std::cout << "Right" << std::endl;
+    }
+    else
+    {
+      RFront.Set(ControlMode::PercentOutput, 0.3);
+			LFront.Set(ControlMode::PercentOutput, -0.3);
+      std::cout << "Forward" << std::endl;
+    }
+	}
 	//The motors will be updated every 5ms
 	frc::Wait(0.005);
 }
