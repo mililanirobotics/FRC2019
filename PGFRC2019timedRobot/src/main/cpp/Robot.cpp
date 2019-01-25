@@ -11,6 +11,7 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
+const double ROLLERPOWER = 1.0; //constant roller power to eject and intake
 void Robot::RobotInit()
 {
   TimedRobot(); //Sets periodic methods to run every 0.02 seconds.
@@ -78,23 +79,26 @@ void Robot::AutonomousPeriodic() //Autonomous that runs periodically
     // Default Auto goes here
   }
 }
-
-void Robot::TeleopInit() 
+void Robot::driveInit()
 {
-  RFront.ConfigPeakOutputForward(1.0, 10);
+	RFront.ConfigPeakOutputForward(1.0, 10);
 	RFront.ConfigPeakOutputReverse(-1.0, 10); //Sets RFront to power range -1.0 to 1.0
 	RFront.SetNeutralMode(NeutralMode::Brake); //Brakes when power is 0
 	LFront.ConfigPeakOutputForward(1.0, 10);
 	LFront.ConfigPeakOutputReverse(-1.0, 10); //Sets LFront to power range -1.0 to 1.0
 	LFront.SetNeutralMode(NeutralMode::Brake); //Brakes when power is 0
-	compressor.SetClosedLoopControl(true); //Opens compressor
-	setFollowers(); //Sets all other drive motors to follow RFront and LFront
 }
 
-void Robot::TeleopPeriodic() //Teleop function that runs periodically.
+void Robot::rollerInit()
 {
-  const double ROLLERPOWER = 0.3; //constant roller power to eject and intake
-  double leftJoystickPower = -joystickL.GetY(); //Gets y value of left joystick
+	rollerTalon.ConfigPeakOutputForward(1.0, 10);
+	rollerTalon.ConfigPeakOutputReverse(-1.0, 10);
+	rollerTalon.SetNeutralMode(NeutralMode::Brake);
+}
+
+void Robot::drivePeriodic()
+{
+	double leftJoystickPower = -joystickL.GetY(); //Gets y value of left joystick
 	double rightJoystickPower = joystickR.GetY(); //Gets y value of right joystick
 	if (joystickL.GetRawButton(1) || joystickR.GetRawButton(1)) //Slowmode if triggers on either joysticks are pressed
   {
@@ -103,6 +107,10 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 	}
 	RFront.Set(ControlMode::PercentOutput, rightJoystickPower); //Sets power to y axis of joysticks
 	LFront.Set(ControlMode::PercentOutput, leftJoystickPower);
+}
+
+void Robot::solenoidPeriodic()
+{
 	if (gamePad1.GetRawButton(5)) //Left bumper is pressed.
   {
 		solenoidOne.Set(true); //Opens both L's
@@ -120,8 +128,11 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 		solenoidOne.Set(false);
 		solenoidTwo.Set(false);
 	}
+}
 
-	if (gamePad1.GetRawButton(2) && limitSwitchOne.Get() == 0) //b
+void Robot::pivotPeriodic()
+{
+		if (gamePad1.GetRawButton(2) && limitSwitchOne.Get() == 0) //b
   {
 		pivotTalon.Set(ControlMode::PercentOutput, 0.3); //Pivots the payload forward
 	}
@@ -135,9 +146,10 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
   {
 		pivotTalon.Set(ControlMode::PercentOutput, 0); //Sets power to 0 if unattended
 	}
+}
 
-			
-
+void Robot::rollerPeriodic()
+{
 	if (gamePad1.GetRawButton(1)) //a
   {
 		rollerTalon.Set(ControlMode::PercentOutput, ROLLERPOWER); //Rolls forward, intakes
@@ -152,6 +164,29 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
   {
 		rollerTalon.Set(ControlMode::PercentOutput, 0); //Sets power to 0 when unattended
 	}
+
+}
+void Robot::TeleopInit() 
+{
+	driveInit(); //Links back to drive initialize code block
+
+	compressor.SetClosedLoopControl(true); //Opens compressor
+
+	setFollowers(); //Sets all other drive motors to follow RFront and LFront
+
+	rollerInit();
+}
+
+void Robot::TeleopPeriodic() //Teleop function that runs periodically.
+{
+  
+	drivePeriodic(); //Links back to code block relating to drive
+
+	solenoidPeriodic(); //Links back to code block relating to solenoids
+
+	pivotPeriodic(); //Links back to code block relating to pivoting the payload
+
+	rollerPeriodic(); //Links back to code block relating to the roller of the payload
 
 	//The motors will be updated every 5ms
 	frc::Wait(0.005);

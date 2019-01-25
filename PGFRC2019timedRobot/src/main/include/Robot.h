@@ -24,7 +24,12 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override;
   void TestPeriodic() override;
   void setFollowers();
-
+  void drivePeriodic();
+  void solenoidPeriodic();
+  void pivotPeriodic();
+  void rollerPeriodic();
+  void driveInit();
+  void rollerInit();
  private:
   //Constants
   const float WHEEL_CIRCUMFERENCE = 18.84955592153876;
