@@ -14,14 +14,15 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 const double ROLLERPOWER = 1.0; //constant roller power to eject and intake
+const int ticksPerRot = 1;			//Needs to be tested and set
 void Robot::RobotInit()
 {
-  TimedRobot(); //Sets periodic methods to run every 0.02 seconds.
-  m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+	TimedRobot(); //Sets periodic methods to run every 0.02 seconds.
+	m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
+	m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
+	frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 }
-void Robot::setFollowers()//Sets back and middle motors to follow the front motors.
+void Robot::setFollowers() //Sets back and middle motors to follow the front motors.
 {
 	LBack.Set(ControlMode::Follower, 12);
 	LMiddle.Set(ControlMode::Follower, 12);
@@ -37,9 +38,8 @@ void Robot::setFollowers()//Sets back and middle motors to follow the front moto
  * <p> This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
  */
-void Robot::RobotPeriodic() //Robot method that runs periodically 
+void Robot::RobotPeriodic() //Robot method that runs periodically
 {
-
 }
 
 /**
@@ -55,47 +55,44 @@ void Robot::RobotPeriodic() //Robot method that runs periodically
  */
 void Robot::AutonomousInit() //Initialization of autonomous
 {
-  m_autoSelected = m_chooser.GetSelected();
-  // m_autoSelected = SmartDashboard::GetString("Auto Selector",
-  //     kAutoNameDefault);
-  std::cout << "Auto selected: " << m_autoSelected << std::endl;
+	m_autoSelected = m_chooser.GetSelected();
+	// m_autoSelected = SmartDashboard::GetString("Auto Selector",
+	//     kAutoNameDefault);
+	std::cout << "Auto selected: " << m_autoSelected << std::endl;
 
-  if (m_autoSelected == kAutoNameCustom) 
-  {
-    // Custom Auto goes here
-  } 
-  else 
-  {
-    // Default Auto goes here
-  }
+	if (m_autoSelected == kAutoNameCustom)
+	{
+		// Custom Auto goes here
+	}
+	else
+	{
+		// Default Auto goes here
+	}
 }
 
-void Robot::AutonomousPeriodic() //Autonomous that runs periodically 
+void Robot::AutonomousPeriodic() //Autonomous that runs periodically
 {
-  if (m_autoSelected == kAutoNameCustom) 
-  {
-    // Custom Auto goes here
-  } 
-  else 
-  {
-    // Default Auto goes here
-  }
+	if (m_autoSelected == kAutoNameCustom)
+	{
+		// Custom Auto goes here
+	}
+	else
+	{
+		// Default Auto goes here
+	}
 }
 void Robot::driveInit()
 {
 	RFront.ConfigPeakOutputForward(1.0, 10);
 	//Motors
-  RFront.ConfigPeakOutputForward(1.0, 10);
-	RFront.ConfigPeakOutputReverse(-1.0, 10); //Sets RFront to power range -1.0 to 1.0
+	RFront.ConfigPeakOutputForward(1.0, 10);
+	RFront.ConfigPeakOutputReverse(-1.0, 10);	//Sets RFront to power range -1.0 to 1.0
 	RFront.SetNeutralMode(NeutralMode::Brake); //Brakes when power is 0
 	LFront.ConfigPeakOutputForward(1.0, 10);
-	LFront.ConfigPeakOutputReverse(-1.0, 10); //Sets LFront to power range -1.0 to 1.0
+	LFront.ConfigPeakOutputReverse(-1.0, 10);	//Sets LFront to power range -1.0 to 1.0
 	LFront.SetNeutralMode(NeutralMode::Brake); //Brakes when power is 0
-	compressor.SetClosedLoopControl(true); //Opens compressor
-	setFollowers(); //Sets all other drive motors to follow RFront and LFront
-
-
-
+	compressor.SetClosedLoopControl(true);		 //Opens compressor
+	setFollowers();														 //Sets all other drive motors to follow RFront and LFront
 }
 
 void Robot::rollerInit()
@@ -106,19 +103,13 @@ void Robot::rollerInit()
 }
 
 void Robot::drivePeriodic()
+{
 
-	double leftJoystickPower = -joystickL.GetY(); //Gets y value of left joystick
-
-	//Camera
-	auto inst = nt::NetworkTableInstance::GetDefault();
-	auto table = inst.GetTable("limelight");
-	
 	//Controller/Motor Power
-  const double ROLLERPOWER = 0.3; //constant roller power to eject and intake
-  double leftJoystickPower = -joystickL.GetY(); //Gets y value of left joystick
-	double rightJoystickPower = joystickR.GetY(); //Gets y value of right joystick
+	double leftJoystickPower = -joystickL.GetY();								//Gets y value of left joystick
+	double rightJoystickPower = joystickR.GetY();								//Gets y value of right joystick
 	if (joystickL.GetRawButton(1) || joystickR.GetRawButton(1)) //Slowmode if triggers on either joysticks are pressed
-  {
+	{
 		rightJoystickPower *= 0.7;
 		leftJoystickPower *= 0.7;
 	}
@@ -129,38 +120,38 @@ void Robot::drivePeriodic()
 void Robot::solenoidPeriodic()
 {
 	if (gamePad1.GetRawButton(5)) //Left bumper is pressed.
-  {
-		solenoidOne.Set(true); //Opens both L's
-		solenoidTwo.Set(true);
-		frc::Wait(0.02); //Delay needed so hatch doesn't hit L's
-		solenoidThree.Set(true); //Pushes the pusher out
-		solenoidFour.Set(true);
-    frc::Wait(1); //Delay to pull back the pusher
-    solenoidThree.Set(false);
-    solenoidFour.Set(false);
+	{
+		topFinger.Set(true); //Opens both L's
+		bottomFinger.Set(true);
+		frc::Wait(0.02);				 //Delay needed so hatch doesn't hit L's
+		rightPusher.Set(true); //Pushes the pusher out
+		leftPusher.Set(true);
+		frc::Wait(1); //Delay to pull back the pusher
+		rightPusher.Set(false);
+		leftPusher.Set(false);
 	}
 
-	if (gamePad1.GetRawButton(6))//If right bumper is pressed, close the L's
-  {
-		solenoidOne.Set(false);
-		solenoidTwo.Set(false);
+	if (gamePad1.GetRawButton(6)) //If right bumper is pressed, close the L's
+	{
+		topFinger.Set(false);
+		bottomFinger.Set(false);
 	}
 }
 
 void Robot::pivotPeriodic()
 {
-		if (gamePad1.GetRawButton(2) && limitSwitchOne.Get() == 0) //b
-  {
+	if (gamePad1.GetRawButton(2) && limitSwitchOne.Get() == 0) //b
+	{
 		pivotTalon.Set(ControlMode::PercentOutput, 0.3); //Pivots the payload forward
 	}
 
 	else if (gamePad1.GetRawButton(3) && limitSwitchTwo.Get() == 0) //x
-  {
+	{
 		pivotTalon.Set(ControlMode::PercentOutput, -0.3); //Pivots the payload backwards
 	}
 
-	else 
-  {
+	else
+	{
 		pivotTalon.Set(ControlMode::PercentOutput, 0); //Sets power to 0 if unattended
 	}
 }
@@ -168,22 +159,21 @@ void Robot::pivotPeriodic()
 void Robot::rollerPeriodic()
 {
 	if (gamePad1.GetRawButton(1)) //a
-  {
+	{
 		rollerTalon.Set(ControlMode::PercentOutput, ROLLERPOWER); //Rolls forward, intakes
 	}
-		
-	else if (gamePad1.GetRawButton(4))//y
-  {
+
+	else if (gamePad1.GetRawButton(4)) //y
+	{
 		rollerTalon.Set(ControlMode::PercentOutput, -ROLLERPOWER); //Rolls backwards, ejects
 	}
 
 	else
-  {
+	{
 		rollerTalon.Set(ControlMode::PercentOutput, 0); //Sets power to 0 when unattended
 	}
-
 }
-void Robot::TeleopInit() 
+void Robot::TeleopInit()
 {
 	driveInit(); //Links back to drive initialize code block
 
@@ -194,49 +184,80 @@ void Robot::TeleopInit()
 	rollerInit();
 }
 
+void Robot::cameraPeriodic()
+{
+	auto inst = nt::NetworkTableInstance::GetDefault();
+	auto table = inst.GetTable("limelight");
+
+	double targetOffsetAngle_Horitzontal = table->GetNumber("tx", 0.0);
+	std::cout << targetOffsetAngle_Horitzontal << std::endl;
+	if (targetOffsetAngle_Horitzontal > -1.0)
+	{
+		RFront.Set(ControlMode::PercentOutput, 0.2);
+		LFront.Set(ControlMode::PercentOutput, -0.3);
+		std::cout << "Left" << std::endl;
+	}
+	else if (targetOffsetAngle_Horitzontal < 1.0)
+	{
+		RFront.Set(ControlMode::PercentOutput, 0.3);
+		LFront.Set(ControlMode::PercentOutput, -0.2);
+		std::cout << "Right" << std::endl;
+	}
+	else
+	{
+		RFront.Set(ControlMode::PercentOutput, 0.3);
+		LFront.Set(ControlMode::PercentOutput, -0.3);
+		std::cout << "Forward" << std::endl;
+	}
+}
+
 void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 {
-  
-	drivePeriodic(); //Links back to code block relating to drive
 
-	solenoidPeriodic(); //Links back to code block relating to solenoids
+	double ticksPerMsRFront = RFront.GetSelectedSensorVelocity(13); //Gets velocity in ticks / 100 ms
 
-	pivotPeriodic(); //Links back to code block relating to pivoting the payload
+	double rotPerMsRFront = ticksPerMsRFront * ticksPerRot; //Gets velocity in rotations / 100 ms
 
-	rollerPeriodic(); //Links back to code block relating to the roller of the payload
+	double rotPerMinRFront = rotPerMsRFront * 60000; //Gets velocity in rotations / minute
 
-	if (joystickR.GetRawButton(2)
-	{ //Alignment with camera
-  	double targetOffsetAngle_Horitzontal = table->GetNumber("tx",0.0);
-		std::cout << targetOffsetAngle_Horitzontal << std::endl;
-		if (targetOffsetAngle_Horitzontal > -1.0)
-		{
-    	RFront.Set(ControlMode::PercentOutput, 0.2);
-			LFront.Set(ControlMode::PercentOutput, -0.3);
-      std::cout << "Left" << std::endl;
-    }
-    else if (targetOffsetAngle_Horitzontal < 1.0)
-    {
-      RFront.Set(ControlMode::PercentOutput, 0.3);
-			LFront.Set(ControlMode::PercentOutput, -0.2);
-      std::cout << "Right" << std::endl;
-    }
-    else
-    {
-      RFront.Set(ControlMode::PercentOutput, 0.3);
-			LFront.Set(ControlMode::PercentOutput, -0.3);
-      std::cout << "Forward" << std::endl;
-    }
+	double ticks = RFront.GetSelectedSensorPosition(13);
+
+	std::cout << "Ticks: " << ticks << std::endl;
+
+	auto inst = nt::NetworkTableInstance::GetDefault();
+	
+	auto table = inst.GetTable("limelight");
+
+	if (joystickR.GetRawButton(2))
+	{ 
+		//Alignment with camera
+		cameraPeriodic();
+	
 	}
+
+	else
+	{
+
+		drivePeriodic(); //Links back to code block relating to drive
+
+		solenoidPeriodic(); //Links back to code block relating to solenoids
+
+		pivotPeriodic(); //Links back to code block relating to pivoting the payload
+
+		rollerPeriodic(); //Links back to code block relating to the roller of the payload
+	}
+
 	//The motors will be updated every 5ms
 	frc::Wait(0.005);
 }
 
-void Robot::TestPeriodic() 
+void Robot::TestPeriodic()
 {
-
 }
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main()
+{
+	return frc::StartRobot<Robot>();
+}
 #endif

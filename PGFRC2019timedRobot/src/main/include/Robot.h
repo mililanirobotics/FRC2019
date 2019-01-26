@@ -28,6 +28,7 @@ class Robot : public frc::TimedRobot {
   void solenoidPeriodic();
   void pivotPeriodic();
   void rollerPeriodic();
+  void cameraPeriodic();
   void driveInit();
   void rollerInit();
  private:
@@ -52,11 +53,11 @@ class Robot : public frc::TimedRobot {
   frc::DigitalInput limitSwitchTwo{1};
   
   //Solenoids
-  frc::Solenoid solenoidOne{4, 5};
-  frc::Solenoid solenoidTwo{6, 7};
-  frc::Solenoid solenoidThree{0, 1};
-  frc::Solenoid solenoidFour{2, 3};
-  frc::Compressor compressor{2};
+  frc::Solenoid topFinger{0};
+  frc::Solenoid bottomFinger{2};
+  frc::Solenoid rightPusher{1};
+  frc::Solenoid leftPusher{3};
+  frc::Compressor compressor{0};
   
   //Controllers
   frc::Joystick joystickL{0};
