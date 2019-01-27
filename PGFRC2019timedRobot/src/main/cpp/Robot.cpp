@@ -97,9 +97,9 @@ void Robot::driveInit()
 
 void Robot::rollerInit()
 {
-	rollerTalon.ConfigPeakOutputForward(1.0, 10);
-	rollerTalon.ConfigPeakOutputReverse(-1.0, 10);
-	rollerTalon.SetNeutralMode(NeutralMode::Brake);
+	//rollerTalon.ConfigPeakOutputForward(1.0, 10);
+	//rollerTalon.ConfigPeakOutputReverse(-1.0, 10);
+	//rollerTalon.SetNeutralMode(NeutralMode::Brake);
 }
 
 void Robot::drivePeriodic()
@@ -142,17 +142,17 @@ void Robot::pivotPeriodic()
 {
 	if (gamePad1.GetRawButton(2) && limitSwitchOne.Get() == 0) //b
 	{
-		pivotTalon.Set(ControlMode::PercentOutput, 0.3); //Pivots the payload forward
+		//pivotTalon.Set(ControlMode::PercentOutput, 0.3); //Pivots the payload forward
 	}
 
 	else if (gamePad1.GetRawButton(3) && limitSwitchTwo.Get() == 0) //x
 	{
-		pivotTalon.Set(ControlMode::PercentOutput, -0.3); //Pivots the payload backwards
+		//pivotTalon.Set(ControlMode::PercentOutput, -0.3); //Pivots the payload backwards
 	}
 
 	else
 	{
-		pivotTalon.Set(ControlMode::PercentOutput, 0); //Sets power to 0 if unattended
+		//pivotTalon.Set(ControlMode::PercentOutput, 0); //Sets power to 0 if unattended
 	}
 }
 
@@ -160,28 +160,18 @@ void Robot::rollerPeriodic()
 {
 	if (gamePad1.GetRawButton(1)) //a
 	{
-		rollerTalon.Set(ControlMode::PercentOutput, ROLLERPOWER); //Rolls forward, intakes
+		//rollerTalon.Set(ControlMode::PercentOutput, ROLLERPOWER); //Rolls forward, intakes
 	}
 
 	else if (gamePad1.GetRawButton(4)) //y
 	{
-		rollerTalon.Set(ControlMode::PercentOutput, -ROLLERPOWER); //Rolls backwards, ejects
+		//rollerTalon.Set(ControlMode::PercentOutput, -ROLLERPOWER); //Rolls backwards, ejects
 	}
 
 	else
 	{
-		rollerTalon.Set(ControlMode::PercentOutput, 0); //Sets power to 0 when unattended
+		//rollerTalon.Set(ControlMode::PercentOutput, 0); //Sets power to 0 when unattended
 	}
-}
-void Robot::TeleopInit()
-{
-	driveInit(); //Links back to drive initialize code block
-
-	compressor.SetClosedLoopControl(true); //Opens compressor
-
-	setFollowers(); //Sets all other drive motors to follow RFront and LFront
-
-	rollerInit();
 }
 
 void Robot::cameraPeriodic()
@@ -210,19 +200,31 @@ void Robot::cameraPeriodic()
 		std::cout << "Forward" << std::endl;
 	}
 }
+void Robot::TeleopInit()
+{
+	driveInit(); //Links back to drive initialize code block
+
+	setFollowers(); //Sets all other drive motors to follow RFront and LFront
+
+	rollerInit(); //Links back to roller config code
+
+	compressor.SetClosedLoopControl(true);
+
+}
+
 
 void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 {
 
-	double ticksPerMsRFront = RFront.GetSelectedSensorVelocity(13); //Gets velocity in ticks / 100 ms
+	//double ticksPerMsRFront = RFront.GetSelectedSensorVelocity(13); //Gets velocity in ticks / 100 ms
 
-	double rotPerMsRFront = ticksPerMsRFront * ticksPerRot; //Gets velocity in rotations / 100 ms
+	//double rotPerMsRFront = ticksPerMsRFront * ticksPerRot; //Gets velocity in rotations / 100 ms
 
-	double rotPerMinRFront = rotPerMsRFront * 60000; //Gets velocity in rotations / minute
+	//double rotPerMinRFront = rotPerMsRFront * 60000; //Gets velocity in rotations / minute
 
-	double ticks = RFront.GetSelectedSensorPosition(13);
+	//double ticks = RFront.GetSelectedSensorPosition(13);
 
-	std::cout << "Ticks: " << ticks << std::endl;
+	//std::cout << "Ticks: " << ticks << std::endl;
 
 	auto inst = nt::NetworkTableInstance::GetDefault();
 	

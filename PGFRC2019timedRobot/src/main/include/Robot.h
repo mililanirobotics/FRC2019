@@ -9,6 +9,7 @@
 #include "ctre/Phoenix.h"
 #include "frc/WPILib.h"
 #include "frc/Compressor.h"
+#include "frc/Solenoid.h"
 #include <string>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
@@ -45,8 +46,8 @@ class Robot : public frc::TimedRobot {
   TalonSRX RBack{11};
   TalonSRX RMiddle{15};
   TalonSRX RFront{13};
-  TalonSRX pivotTalon{16};
-  TalonSRX rollerTalon{17};
+  //TalonSRX pivotTalon{16};
+  //TalonSRX rollerTalon{17};
   
   //Limit switches
   frc::DigitalInput limitSwitchOne{0};
