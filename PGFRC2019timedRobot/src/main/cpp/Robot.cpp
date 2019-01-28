@@ -179,17 +179,18 @@ void Robot::cameraPeriodic()
 	auto inst = nt::NetworkTableInstance::GetDefault();
 	auto table = inst.GetTable("limelight");
 
-	double targetOffsetAngle_Horitzontal = table->GetNumber("tx", 7.0);
+	double targetOffsetAngle_Horitzontal = table->GetNumber("tx", 0.0);
 	std::cout << targetOffsetAngle_Horitzontal << std::endl;
-	if (targetOffsetAngle_Horitzontal < -1.0)
+	double offsetAdjust = fabs(targetOffsetAngle_Horitzontal * 0.05);
+	if (targetOffsetAngle_Horitzontal < 0)
 	{
 		RFront.Set(ControlMode::PercentOutput, -0.3);
-		LFront.Set(ControlMode::PercentOutput, 0.2);
+		LFront.Set(ControlMode::PercentOutput, 0.3 - offsetAdjust);
 		std::cout << "Left" << std::endl;
 	}
-	else if (targetOffsetAngle_Horitzontal > 1.0)
+	else if (targetOffsetAngle_Horitzontal > 0)
 	{
-		RFront.Set(ControlMode::PercentOutput, -0.2);
+		RFront.Set(ControlMode::PercentOutput, -0.3 + offsetAdjust);
 		LFront.Set(ControlMode::PercentOutput, 0.3);
 		std::cout << "Right" << std::endl;
 	}
