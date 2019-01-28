@@ -9,6 +9,7 @@
 #include "ctre/Phoenix.h"
 #include "frc/WPILib.h"
 #include "frc/Compressor.h"
+#include "frc/DoubleSolenoid.h"
 #include <string>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
@@ -52,11 +53,11 @@ class Robot : public frc::TimedRobot {
   frc::DigitalInput limitSwitchTwo{1};
   
   //Solenoids
-  frc::Solenoid solenoidOne{4, 5};
-  frc::Solenoid solenoidTwo{6, 7};
-  frc::Solenoid solenoidThree{0, 1};
-  frc::Solenoid solenoidFour{2, 3};
-  frc::Compressor compressor{2};
+  frc::DoubleSolenoid solenoidOne{4, 5};
+  // frc::Solenoid solenoidTwo{6, 7};
+  // frc::Solenoid solenoidThree{0, 1};
+  // frc::Solenoid solenoidFour{2, 3};
+  frc::Compressor compressor{0};
   
   //Controllers
   frc::Joystick joystickL{0};

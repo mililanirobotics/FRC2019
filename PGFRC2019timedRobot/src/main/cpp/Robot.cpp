@@ -106,12 +106,9 @@ void Robot::rollerInit()
 }
 
 void Robot::drivePeriodic()
+{
 
-	double leftJoystickPower = -joystickL.GetY(); //Gets y value of left joystick
 
-	//Camera
-	auto inst = nt::NetworkTableInstance::GetDefault();
-	auto table = inst.GetTable("limelight");
 	
 	//Controller/Motor Power
   const double ROLLERPOWER = 0.3; //constant roller power to eject and intake
@@ -126,26 +123,26 @@ void Robot::drivePeriodic()
 	LFront.Set(ControlMode::PercentOutput, leftJoystickPower);
 }
 
-void Robot::solenoidPeriodic()
-{
-	if (gamePad1.GetRawButton(5)) //Left bumper is pressed.
-  {
-		solenoidOne.Set(true); //Opens both L's
-		solenoidTwo.Set(true);
-		frc::Wait(0.02); //Delay needed so hatch doesn't hit L's
-		solenoidThree.Set(true); //Pushes the pusher out
-		solenoidFour.Set(true);
-    frc::Wait(1); //Delay to pull back the pusher
-    solenoidThree.Set(false);
-    solenoidFour.Set(false);
-	}
+// void Robot::solenoidPeriodic()
+// {
+// 	if (gamePad1.GetRawButton(5)) //Left bumper is pressed.
+//   {
+// 		solenoidOne.Set(true); //Opens both L's
+// 		solenoidTwo.Set(true);
+// 		frc::Wait(0.02); //Delay needed so hatch doesn't hit L's
+// 		solenoidThree.Set(true); //Pushes the pusher out
+// 		solenoidFour.Set(true);
+//     frc::Wait(1); //Delay to pull back the pusher
+//     solenoidThree.Set(false);
+//     solenoidFour.Set(false);
+// 	}
 
-	if (gamePad1.GetRawButton(6))//If right bumper is pressed, close the L's
-  {
-		solenoidOne.Set(false);
-		solenoidTwo.Set(false);
-	}
-}
+// 	if (gamePad1.GetRawButton(6))//If right bumper is pressed, close the L's
+//   {
+// 		solenoidOne.Set(false);
+// 		solenoidTwo.Set(false);
+// 	}
+// }
 
 void Robot::pivotPeriodic()
 {
@@ -196,35 +193,45 @@ void Robot::TeleopInit()
 
 void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 {
-  
+  //Camera
+	auto inst = nt::NetworkTableInstance::GetDefault();
+	auto table = inst.GetTable("limelight");
+
 	drivePeriodic(); //Links back to code block relating to drive
 
-	solenoidPeriodic(); //Links back to code block relating to solenoids
+	//solenoidPeriodic(); //Links back to code block relating to solenoids
 
 	pivotPeriodic(); //Links back to code block relating to pivoting the payload
 
 	rollerPeriodic(); //Links back to code block relating to the roller of the payload
 
-	if (joystickR.GetRawButton(2)
+	if (gamePad1.GetRawButton(5)){
+		solenoidOne.Set(frc::DoubleSolenoid::Value::kForward);
+	}
+	if (gamePad1.GetRawButton(6)){
+		solenoidOne.Set(frc::DoubleSolenoid::Value::kReverse);
+	}
+
+	if (joystickR.GetRawButton(2))
 	{ //Alignment with camera
   	double targetOffsetAngle_Horitzontal = table->GetNumber("tx",0.0);
 		std::cout << targetOffsetAngle_Horitzontal << std::endl;
 		if (targetOffsetAngle_Horitzontal > -1.0)
 		{
     	RFront.Set(ControlMode::PercentOutput, 0.2);
-			LFront.Set(ControlMode::PercentOutput, -0.3);
+			LFront.Set(ControlMode::PercentOutput, 0.3);
       std::cout << "Left" << std::endl;
     }
     else if (targetOffsetAngle_Horitzontal < 1.0)
     {
       RFront.Set(ControlMode::PercentOutput, 0.3);
-			LFront.Set(ControlMode::PercentOutput, -0.2);
+			LFront.Set(ControlMode::PercentOutput, 0.2);
       std::cout << "Right" << std::endl;
     }
     else
     {
       RFront.Set(ControlMode::PercentOutput, 0.3);
-			LFront.Set(ControlMode::PercentOutput, -0.3);
+			LFront.Set(ControlMode::PercentOutput, 0.3);
       std::cout << "Forward" << std::endl;
     }
 	}
