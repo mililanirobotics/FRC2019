@@ -183,20 +183,20 @@ void Robot::cameraPeriodic()
 	std::cout << targetOffsetAngle_Horitzontal << std::endl;
 	if (targetOffsetAngle_Horitzontal > -1.0)
 	{
-		RFront.Set(ControlMode::PercentOutput, 0.2);
-		LFront.Set(ControlMode::PercentOutput, -0.3);
+		//RFront.Set(ControlMode::PercentOutput, -0.25);
+		//LFront.Set(ControlMode::PercentOutput, 0.3);
 		std::cout << "Left" << std::endl;
 	}
 	else if (targetOffsetAngle_Horitzontal < 1.0)
 	{
-		RFront.Set(ControlMode::PercentOutput, 0.3);
-		LFront.Set(ControlMode::PercentOutput, -0.2);
+		//RFront.Set(ControlMode::PercentOutput, -0.3);
+		//LFront.Set(ControlMode::PercentOutput, 0.25);
 		std::cout << "Right" << std::endl;
 	}
 	else
 	{
-		RFront.Set(ControlMode::PercentOutput, 0.3);
-		LFront.Set(ControlMode::PercentOutput, -0.3);
+		//RFront.Set(ControlMode::PercentOutput, -0.3);
+		//LFront.Set(ControlMode::PercentOutput, 0.3);
 		std::cout << "Forward" << std::endl;
 	}
 }
