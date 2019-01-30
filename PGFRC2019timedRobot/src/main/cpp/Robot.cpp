@@ -184,7 +184,12 @@ void Robot::cameraPeriodic()
 	double targetOffsetAngle_Horitzontal = table->GetNumber("tx", 0.0);
 	std::cout << targetOffsetAngle_Horitzontal << std::endl;
 	double offsetAdjust = fabs(targetOffsetAngle_Horitzontal * 0.05);
-	if (targetOffsetAngle_Horitzontal < 0)
+
+	if (targetOffsetAngle_Horitzontal > 15 || targetOffsetAngle_Horitzontal < -15)
+	{
+		std::cout << "Too far off!" << std::endl;		
+	}
+	else if (targetOffsetAngle_Horitzontal < 0)
 	{
 		RFront.Set(ControlMode::PercentOutput, -0.3);
 		LFront.Set(ControlMode::PercentOutput, 0.3 - offsetAdjust);
