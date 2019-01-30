@@ -179,6 +179,8 @@ void Robot::cameraPeriodic()
 	auto inst = nt::NetworkTableInstance::GetDefault();
 	auto table = inst.GetTable("limelight");
 
+	inst.GetTable("limelight")->PutNumber("camMode", 0);
+
 	double targetOffsetAngle_Horitzontal = table->GetNumber("tx", 0.0);
 	std::cout << targetOffsetAngle_Horitzontal << std::endl;
 	double offsetAdjust = fabs(targetOffsetAngle_Horitzontal * 0.05);
@@ -240,6 +242,7 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 
 	else
 	{
+		inst.GetTable("limelight")->PutNumber("camMode", 1);//Changes camera mode
 
 		drivePeriodic(); //Links back to code block relating to drive
 
