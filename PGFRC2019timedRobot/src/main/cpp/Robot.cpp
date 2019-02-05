@@ -83,7 +83,6 @@ void Robot::AutonomousPeriodic() //Autonomous that runs periodically
 }
 void Robot::driveInit()
 {
-	RFront.ConfigPeakOutputForward(1.0, 10);
 	//Motors
 	RFront.ConfigPeakOutputForward(1.0, 10);
 	RFront.ConfigPeakOutputReverse(-1.0, 10);	//Sets RFront to power range -1.0 to 1.0
@@ -124,17 +123,29 @@ void Robot::solenoidPeriodic()
 		topFinger.Set(true); //Opens both L's
 		bottomFinger.Set(true);
 		frc::Wait(0.02);				 //Delay needed so hatch doesn't hit L's
-		rightPusher.Set(true); //Pushes the pusher out
+		/*rightPusher.Set(true); //Pushes the pusher out
 		leftPusher.Set(true);
 		frc::Wait(1); //Delay to pull back the pusher
 		rightPusher.Set(false);
-		leftPusher.Set(false);
+		leftPusher.Set(false);*/
 	}
 
 	if (gamePad1.GetRawButton(6)) //If right bumper is pressed, close the L's
 	{
 		topFinger.Set(false);
 		bottomFinger.Set(false);
+	}
+	
+	if (gamePad1.GetRawButton(7))
+	{
+				topFinger.Set(true); //Opens both L's
+		bottomFinger.Set(true);
+		frc::Wait(0.02);				 //Delay needed so hatch doesn't hit L's
+		rightPusher.Set(true); //Pushes the pusher out
+		leftPusher.Set(true);
+		frc::Wait(1); //Delay to pull back the pusher
+		rightPusher.Set(false);
+		leftPusher.Set(false);
 	}
 }
 
@@ -185,7 +196,7 @@ void Robot::cameraPeriodic()
 
 	double targetOffsetAngle_Horitzontal = table->GetNumber("tx", 0.0);
 	std::cout << targetOffsetAngle_Horitzontal << std::endl;
-	double offsetAdjust = fabs(targetOffsetAngle_Horitzontal * 0.05);
+	double offsetAdjust = fabs(targetOffsetAngle_Horitzontal * 0.03);
 	if (targetOffsetAngle_Horitzontal < 0)
 	{
 		RFront.Set(ControlMode::PercentOutput, -0.3);
@@ -203,7 +214,22 @@ void Robot::cameraPeriodic()
 		RFront.Set(ControlMode::PercentOutput, -0.3);
 		LFront.Set(ControlMode::PercentOutput, 0.3);
 		std::cout << "Forward" << std::endl;
+
 	}
+	if (timer.Get() > 3 && RFront.GetSelectedSensorVelocity() == 0 && LFront.GetSelectedSensorVelocity() == 0)
+	{
+		topFinger.Set(true); //Opens both L's
+		bottomFinger.Set(true);
+		frc::Wait(0.02);				 //Delay needed so hatch doesn't hit L's
+		rightPusher.Set(true); //Pushes the pusher out
+		leftPusher.Set(true);
+		frc::Wait(1); //Delay to pull back the pusher
+		rightPusher.Set(false);
+		leftPusher.Set(false);
+		LFront.Set(ControlMode::Position, 30);
+	}
+
+
 }
 void Robot::TeleopInit()
 {
@@ -214,6 +240,8 @@ void Robot::TeleopInit()
 	rollerInit(); //Links back to roller config code
 
 	compressor.SetClosedLoopControl(true);
+	
+	timer.Start();
 
 }
 
@@ -235,15 +263,33 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 	
 	auto table = inst.GetTable("limelight");
 
+	double time = timer.Get();
+
+	double xPosition = pivotAccel.GetX();
+	double yPosition = pivotAccel.GetY();
+	double zPosition = pivotAccel.GetZ();
+
+	std::cout << "x: " << xPosition << " y: " << yPosition << " z: " << zPosition << std::endl;
+	frc::Wait(2);
 	if (joystickR.GetRawButton(2))
 	{ 
 		//Alignment with camera
 		cameraPeriodic();
 	
 	}
+	else if (joystickL.GetRawButton(10) || joystickR.GetRawButton(10))
+	{
+		timer.Reset();
 
+		inst.GetTable("limelight")->PutNumber("camMode", 0);//changes camera mode for light sensor
+
+		inst.GetTable("limelight")->PutNumber("ledMode", 0);//Turns camera light on
+	}
 	else
 	{
+
+		timer.Reset();
+
 		inst.GetTable("limelight")->PutNumber("camMode", 1);//Changes camera mode
 
 		inst.GetTable("limelight")->PutNumber("ledMode", 1);//Turns camera light off

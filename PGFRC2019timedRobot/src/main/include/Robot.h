@@ -65,6 +65,12 @@ class Robot : public frc::TimedRobot {
   frc::Joystick joystickR{1};
   frc::Joystick gamePad1{2};
 
+  //timer
+  frc::Timer timer{};
+
+  //Accelerometer
+  frc::ADXL345_I2C pivotAccel{frc::I2C::Port::kOnboard};
+
   frc::SendableChooser<std::string> m_chooser;
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";
