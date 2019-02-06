@@ -71,6 +71,9 @@ class Robot : public frc::TimedRobot {
   //Emergency Stop
   frc::DigitalInput emergencyStop{9};
 
+  //Emergency Stop
+  frc::DigitalInput emergencyStop{9};  
+
   //Accelerometer
   frc::ADXL345_I2C pivotAccel{frc::I2C::Port::kOnboard};
   

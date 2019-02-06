@@ -10,7 +10,6 @@
 #include "networktables/NetworkTableEntry.h"
 #include "networktables/NetworkTable.h"
 #include <iostream>
-
 #include <frc/smartdashboard/SmartDashboard.h>
 
 const double ROLLERPOWER = 1.0; //constant roller power to eject and intake
@@ -138,7 +137,7 @@ void Robot::solenoidPeriodic()
 	
 	if (gamePad1.GetRawButton(7))
 	{
-				topFinger.Set(true); //Opens both L's
+		topFinger.Set(true); //Opens both L's
 		bottomFinger.Set(true);
 		frc::Wait(0.02);				 //Delay needed so hatch doesn't hit L's
 		rightPusher.Set(true); //Pushes the pusher out
@@ -201,20 +200,16 @@ void Robot::cameraPeriodic()
 	{
 		RFront.Set(ControlMode::PercentOutput, -0.3);
 		LFront.Set(ControlMode::PercentOutput, 0.3 - offsetAdjust);
-		std::cout << "Left" << std::endl;
 	}
 	else if (targetOffsetAngle_Horitzontal > 0)
 	{
 		RFront.Set(ControlMode::PercentOutput, -0.3 + offsetAdjust);
 		LFront.Set(ControlMode::PercentOutput, 0.3);
-		std::cout << "Right" << std::endl;
 	}
 	else
 	{
 		RFront.Set(ControlMode::PercentOutput, -0.3);
 		LFront.Set(ControlMode::PercentOutput, 0.3);
-		std::cout << "Forward" << std::endl;
-
 	}
 	if (timer.Get() > 3 && RFront.GetSelectedSensorVelocity() == 0 && LFront.GetSelectedSensorVelocity() == 0)
 	{
@@ -282,6 +277,8 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 		inst.GetTable("limelight")->PutNumber("camMode", 0);//changes camera mode for light sensor
 
 		inst.GetTable("limelight")->PutNumber("ledMode", 0);//Turns camera light on
+	
+		std::cout << table->GetNumber("ts", 0.0) << std::endl;
 	}
 	else
 	{
