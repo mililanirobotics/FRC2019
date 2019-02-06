@@ -13,7 +13,7 @@
 #include <string>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
-
+#include <frc/DigitalInput.h>
 class Robot : public frc::TimedRobot {
  public:
   //Functions being initialized
@@ -67,10 +67,13 @@ class Robot : public frc::TimedRobot {
 
   //timer
   frc::Timer timer{};
+  
+  //Emergency Stop
+  frc::DigitalInput emergencyStop{9};
 
   //Accelerometer
   frc::ADXL345_I2C pivotAccel{frc::I2C::Port::kOnboard};
-
+  
   frc::SendableChooser<std::string> m_chooser;
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";

@@ -259,18 +259,16 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 
 	//std::cout << "Ticks: " << ticks << std::endl;
 
+
 	auto inst = nt::NetworkTableInstance::GetDefault();
 	
 	auto table = inst.GetTable("limelight");
 
 	double time = timer.Get();
-
-	double xPosition = pivotAccel.GetX();
-	double yPosition = pivotAccel.GetY();
-	double zPosition = pivotAccel.GetZ();
-
-	std::cout << "x: " << xPosition << " y: " << yPosition << " z: " << zPosition << std::endl;
-	frc::Wait(2);
+	double xAccel = pivotAccel.GetX();
+	double yAccel = pivotAccel.GetY();
+	double zAccel = pivotAccel.GetZ();
+	std::cout << "x: " << xAccel << " y: " << yAccel << " z: " << zAccel << std::endl;
 	if (joystickR.GetRawButton(2))
 	{ 
 		//Alignment with camera
@@ -301,10 +299,18 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 		pivotPeriodic(); //Links back to code block relating to pivoting the payload
 
 		rollerPeriodic(); //Links back to code block relating to the roller of the payload
+		//std::cout << "emergencyStop = " << emergencyStop.Get() << std::endl;
+		while (emergencyStop.Get() == 1)
+		{
+			std::cout << "Stopped" << std::endl;
+			RFront.Set(ControlMode::PercentOutput, 0);
+			LFront.Set(ControlMode::PercentOutput, 0);
+			compressor.SetClosedLoopControl(false);
+
+		}	
 	}
 
 	//The motors will be updated every 5ms
-	frc::Wait(0.005);
 }
 
 void Robot::TestPeriodic()
