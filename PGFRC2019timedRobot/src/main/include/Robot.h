@@ -32,12 +32,14 @@ class Robot : public frc::TimedRobot {
   void cameraPeriodic();
   void driveInit();
   void rollerInit();
+  bool inRange(int targetValue, int currentValue, int error);
  private:
   //Constants
   const float WHEEL_CIRCUMFERENCE = 18.84955592153876;
   const double GEAR_RATIO = 1;
   const double TICKS_PER_ROTATION = 1;
   const int OFF_SET_DISTANCE = 400;
+  
 
   //Talons
   TalonSRX LBack{10};
@@ -46,7 +48,7 @@ class Robot : public frc::TimedRobot {
   TalonSRX RBack{11};
   TalonSRX RMiddle{15};
   TalonSRX RFront{13};
-  //TalonSRX pivotTalon{16};
+  TalonSRX pivotTalon{16};
   //TalonSRX rollerTalon{17};
   
   //Limit switches
@@ -70,9 +72,6 @@ class Robot : public frc::TimedRobot {
   
   //Emergency Stop
   frc::DigitalInput emergencyStop{9};
-
-  //Emergency Stop
-  frc::DigitalInput emergencyStop{9};  
 
   //Accelerometer
   frc::ADXL345_I2C pivotAccel{frc::I2C::Port::kOnboard};

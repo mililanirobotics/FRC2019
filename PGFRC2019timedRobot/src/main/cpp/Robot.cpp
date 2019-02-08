@@ -14,6 +14,7 @@
 
 const double ROLLERPOWER = 1.0; //constant roller power to eject and intake
 const int ticksPerRot = 1;			//Needs to be tested and set
+int pivotPosition = 1;
 void Robot::RobotInit()
 {
 	TimedRobot(); //Sets periodic methods to run every 0.02 seconds.
@@ -147,22 +148,70 @@ void Robot::solenoidPeriodic()
 		leftPusher.Set(false);
 	}
 }
-
-void Robot::pivotPeriodic()
+bool Robot::inRange(int targetValue, int currentValue, int error)
 {
-	if (gamePad1.GetRawButton(2) && limitSwitchOne.Get() == 0) //b
+	if (targetValue - error < currentValue && targetValue + error > currentValue)
 	{
-		//pivotTalon.Set(ControlMode::PercentOutput, 0.3); //Pivots the payload forward
+		return true;
 	}
-
-	else if (gamePad1.GetRawButton(3) && limitSwitchTwo.Get() == 0) //x
-	{
-		//pivotTalon.Set(ControlMode::PercentOutput, -0.3); //Pivots the payload backwards
-	}
-
 	else
 	{
-		//pivotTalon.Set(ControlMode::PercentOutput, 0); //Sets power to 0 if unattended
+		return false;
+	}
+}
+void Robot::pivotPeriodic()
+{
+	double xAccel = pivotAccel.GetX();
+	double yAccel = pivotAccel.GetY();
+	double radians = atan2 (xAccel, yAccel);
+	int degreess = radians * (180 / M_PI);
+	std::cout << degreess << "position: " << pivotPosition <<std::endl;
+	std::cout << "inrange: " << inRange(0, degreess, 7) << std::endl;
+	if (gamePad1.GetRawButtonPressed(4) && pivotPosition != 1)// Changes the position every time you hit button Y and stops after position 1
+	{
+		pivotPosition--;
+	}
+	else if (gamePad1.GetRawButtonPressed(1) && pivotPosition != 3)// Changes the position every time you hit button A and stops after position 3
+	{
+		pivotPosition++;
+	}
+	if (pivotPosition == 1)//chacks to see if it is on position 1
+	{
+		if (inRange(0, degreess, 15) != 0)// checks to see if the degreessss on the accelerometer is equal to 0
+		{
+			pivotTalon.Set(ControlMode::PercentOutput, 1);// if it is not it will more pivot motor
+		}
+		else
+		{
+			pivotTalon.Set(ControlMode::PercentOutput, 0);// sets the pivot motors to not move
+		}
+	}
+	else if (pivotPosition == 2)// chacks to see if the code is in position 2
+	{
+		if (inRange(0, degreess, 15) < 50)// chacks to see 
+		{
+			pivotTalon.Set(ControlMode::PercentOutput, -1);
+		}
+		else if (inRange(0, degreess, 15) > 50)
+		{
+			pivotTalon.Set(ControlMode::PercentOutput, 1);
+		}
+		else
+		{
+			pivotTalon.Set(ControlMode::PercentOutput, 0);
+		}
+
+	}
+	else if (pivotPosition == 3)
+	{
+		if (inRange(0, degreess, 15) != 143)
+		{
+			pivotTalon.Set(ControlMode::PercentOutput, -1);
+		}
+		else
+		{
+			pivotTalon.Set(ControlMode::PercentOutput, 0);
+		}
 	}
 }
 
@@ -263,7 +312,7 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 	double xAccel = pivotAccel.GetX();
 	double yAccel = pivotAccel.GetY();
 	double zAccel = pivotAccel.GetZ();
-	std::cout << "x: " << xAccel << " y: " << yAccel << " z: " << zAccel << std::endl;
+	//std::cout << "x: " << xAccel << " y: " << yAccel << std::endl;
 	if (joystickR.GetRawButton(2))
 	{ 
 		//Alignment with camera
@@ -297,14 +346,14 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 
 		rollerPeriodic(); //Links back to code block relating to the roller of the payload
 		//std::cout << "emergencyStop = " << emergencyStop.Get() << std::endl;
-		while (emergencyStop.Get() == 1)
-		{
-			std::cout << "Stopped" << std::endl;
-			RFront.Set(ControlMode::PercentOutput, 0);
-			LFront.Set(ControlMode::PercentOutput, 0);
-			compressor.SetClosedLoopControl(false);
+	// 	while (emergencyStop.Get() == 1)
+	// 	{
+	// 		std::cout << "Stopped" << std::endl;
+	// 		RFront.Set(ControlMode::PercentOutput, 0);
+	// 		LFront.Set(ControlMode::PercentOutput, 0);
+	// 		compressor.SetClosedLoopControl(false);
 
-		}	
+	// 	}	
 	}
 
 	//The motors will be updated every 5ms
