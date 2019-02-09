@@ -165,51 +165,71 @@ void Robot::pivotPeriodic()
 	double yAccel = pivotAccel.GetY();
 	double radians = atan2 (xAccel, yAccel);
 	int degreess = radians * (180 / M_PI);
-	std::cout << degreess << "position: " << pivotPosition <<std::endl;
+	std::cout << "degrees: " << degreess << std::endl << "position: " << pivotPosition <<std::endl;
 	std::cout << "inrange: " << inRange(0, degreess, 7) << std::endl;
 	if (gamePad1.GetRawButtonPressed(4) && pivotPosition != 1)// Changes the position every time you hit button Y and stops after position 1
 	{
 		pivotPosition--;
 	}
-	else if (gamePad1.GetRawButtonPressed(1) && pivotPosition != 3)// Changes the position every time you hit button A and stops after position 3
+	else if (gamePad1.GetRawButtonPressed(1) && pivotPosition != 4)// Changes the position every time you hit button A and stops after position 3
 	{
 		pivotPosition++;
 	}
 	if (pivotPosition == 1)//chacks to see if it is on position 1
 	{
-		if (inRange(0, degreess, 15) != 0)// checks to see if the degreessss on the accelerometer is equal to 0
+		if (!inRange(0, degreess, 3.5))// checks to see if the degreessss on the accelerometer is equal to 0
 		{
-			pivotTalon.Set(ControlMode::PercentOutput, 1);// if it is not it will more pivot motor
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+			pivotTalon.Set(ControlMode::PercentOutput, -0.3);// if it is not it will more pivot motor
 		}
 		else
 		{
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
 			pivotTalon.Set(ControlMode::PercentOutput, 0);// sets the pivot motors to not move
 		}
 	}
 	else if (pivotPosition == 2)// chacks to see if the code is in position 2
 	{
-		if (inRange(0, degreess, 15) < 50)// chacks to see 
+		if (!inRange(-30, degreess, 3.5) && degreess > -30)// chacks to see 
 		{
-			pivotTalon.Set(ControlMode::PercentOutput, -1);
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+			pivotTalon.Set(ControlMode::PercentOutput, 0.3);
 		}
-		else if (inRange(0, degreess, 15) > 50)
+		else if (!inRange(-30, degreess, 3.5) && degreess < -30)
 		{
-			pivotTalon.Set(ControlMode::PercentOutput, 1);
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+			pivotTalon.Set(ControlMode::PercentOutput, -0.3);
 		}
 		else
 		{
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
 			pivotTalon.Set(ControlMode::PercentOutput, 0);
 		}
 
 	}
 	else if (pivotPosition == 3)
 	{
-		if (inRange(0, degreess, 15) != 143)
+		if (!inRange(-54, degreess, 3.5) && degreess > -54)// chacks to see 
 		{
-			pivotTalon.Set(ControlMode::PercentOutput, -1);
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+			pivotTalon.Set(ControlMode::PercentOutput, 0.3);
+		}
+		else if (!inRange(-54, degreess, 3.5) && degreess < -54)
+		{
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+			pivotTalon.Set(ControlMode::PercentOutput, -0.3);
+		}
+	}
+	else if (pivotPosition == 4)
+	{
+		if (!inRange(-137, degreess, 3.5))
+		{
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+			pivotTalon.Set(ControlMode::PercentOutput, 0.3);
 		}
 		else
 		{
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
 			pivotTalon.Set(ControlMode::PercentOutput, 0);
 		}
 	}

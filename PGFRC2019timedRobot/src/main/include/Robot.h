@@ -14,6 +14,7 @@
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/DigitalInput.h>
+#include "frc/DoubleSolenoid.h"
 class Robot : public frc::TimedRobot {
  public:
   //Functions being initialized
@@ -60,6 +61,7 @@ class Robot : public frc::TimedRobot {
   frc::Solenoid bottomFinger{2};
   frc::Solenoid rightPusher{1};
   frc::Solenoid leftPusher{3};
+  frc::DoubleSolenoid pivotBrake{4, 5};
   frc::Compressor compressor{0};
   
   //Controllers
