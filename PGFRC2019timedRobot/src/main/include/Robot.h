@@ -43,12 +43,12 @@ class Robot : public frc::TimedRobot {
   
 
   //Talons
-  TalonSRX LBack{10};
-  TalonSRX LMiddle{14};
-  TalonSRX LFront{12};
-  TalonSRX RBack{11};
-  TalonSRX RMiddle{15};
-  TalonSRX RFront{13};
+    TalonSRX LBack{10};
+    TalonSRX LMiddle{14};
+    TalonSRX LFront{12};
+    TalonSRX RBack{11};
+    TalonSRX RMiddle{15};
+    TalonSRX RFront{13};
   TalonSRX pivotTalon{16};
   //TalonSRX rollerTalon{17};
   

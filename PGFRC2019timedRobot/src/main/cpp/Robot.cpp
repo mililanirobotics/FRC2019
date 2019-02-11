@@ -177,11 +177,18 @@ void Robot::pivotPeriodic()
 	}
 	if (pivotPosition == 1)//chacks to see if it is on position 1
 	{
-		if (!inRange(0, degreess, 3.5))// checks to see if the degreessss on the accelerometer is equal to 0
+		if (!inRange(0, degreess, 3.5) && degreess < 0)// checks to see if the degreessss on the accelerometer is equal to 0
 		{
 			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
 			pivotTalon.Set(ControlMode::PercentOutput, -0.3);// if it is not it will more pivot motor
 		}
+
+		else if (!inRange(0, degreess, 3.5) && degreess > 0)
+		{
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+			pivotTalon.Set(ControlMode::PercentOutput, 0.3);
+		}
+
 		else
 		{
 			pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
@@ -209,7 +216,7 @@ void Robot::pivotPeriodic()
 	}
 	else if (pivotPosition == 3)
 	{
-		if (!inRange(-54, degreess, 3.5) && degreess > -54)// chacks to see 
+		if (!inRange(-54, degreess, 3.5) && degreess > -54)
 		{
 			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
 			pivotTalon.Set(ControlMode::PercentOutput, 0.3);
@@ -222,10 +229,16 @@ void Robot::pivotPeriodic()
 	}
 	else if (pivotPosition == 4)
 	{
-		if (!inRange(-137, degreess, 3.5))
+		if (!inRange(-137, degreess, 3.5) && degreess > -137)
 		{
 			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
 			pivotTalon.Set(ControlMode::PercentOutput, 0.3);
+		}
+
+		else if (!inRange(-137, degreess, 3.5) && degreess < -137)
+		{
+			pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+			pivotTalon.Set(ControlMode::PercentOutput, -0.3);
 		}
 		else
 		{
@@ -343,10 +356,10 @@ void Robot::TeleopPeriodic() //Teleop function that runs periodically.
 	{
 		timer.Reset();
 
-		inst.GetTable("limelight")->PutNumber("camMode", 0);//changes camera mode for light sensor
+			inst.GetTable("limelight")->PutNumber("camMode", 0);//changes camera mode for light sensor
 
-		inst.GetTable("limelight")->PutNumber("ledMode", 0);//Turns camera light on
-	
+			inst.GetTable("limelight")->PutNumber("ledMode", 0);//Turns camera light on
+		
 		std::cout << table->GetNumber("ts", 0.0) << std::endl;
 	}
 	else
