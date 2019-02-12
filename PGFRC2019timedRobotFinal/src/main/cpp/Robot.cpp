@@ -47,13 +47,12 @@ void Robot::RobotPeriodic()
 void Robot::AutonomousInit()
 {
   ///@todo Lon  Remove these unsued code, chooser, autoselected, etc.
-
+  TeleopInit();
 }
 
 void Robot::AutonomousPeriodic()
 {
   ///@todo Lon you need to run code during autonomous
-  TeleopInit();
   TeleopPeriodic();
 }
 void Robot::rollerInit()
@@ -329,7 +328,7 @@ void Robot::cameraAlign()
 void Robot::cameraPeriodicHatch()
 {
   cameraAlign();
-  if (timer.Get() > 3 && RFront.GetSelectedSensorVelocity() == 0 && LFront.GetSelectedSensorVelocity() == 0)
+  if (timer.Get() > 1 && RFront.GetSelectedSensorVelocity() == 0 && LFront.GetSelectedSensorVelocity() == 0)
 	  {
       
       ///@todo Lon write a function to shoot and use it in both places
@@ -350,7 +349,7 @@ void Robot::cameraPeriodicCargo()
   cameraAlign();
   double angleRadians = atan2(pivotAccel.GetX(), pivotAccel.GetY()); //Grabs angle in radians
   double angleDegrees = angleRadians * (180/M_PI); //Converts angle to degrees
-  if (timer.Get() > 3 && RFront.GetSelectedSensorVelocity() == 0 && LFront.GetSelectedSensorVelocity() == 0)
+  if (timer.Get() > 1 && RFront.GetSelectedSensorVelocity() == 0 && LFront.GetSelectedSensorVelocity() == 0)
 	{
     //Needs to drive backwards first, get measurements from cad
     goToRange(-30, angleDegrees, 3.5);
@@ -408,6 +407,10 @@ void Robot::TeleopPeriodic()
     pivotPeriodic(); //Links back to position code
 
     drivePeriodic(); //Links back to drive code and slowmode
+
+    inst.GetTable("limelight")->PutNumber("camMode", 1);
+
+    inst.GetTable("limelight")->PutNumber("ledMode", 1);
 
    // emergencyPeriodic(); //Links back to emergency stop code
   }
