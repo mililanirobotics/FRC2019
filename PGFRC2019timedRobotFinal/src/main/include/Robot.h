@@ -39,7 +39,7 @@ class Robot : public frc::TimedRobot
   void cameraPeriodicHatch();
   void cameraPeriodicCargo();
   void emergencyPeriodic();
-
+  void shootHatch();
   
   //Talons
   TalonSRX LBack{10};
@@ -74,7 +74,6 @@ class Robot : public frc::TimedRobot
   frc::DigitalInput emergencyStop{9};
 
 
-
   double rollerEjectButton; //Left Trigger
   double rollerIntakeButton; //Right Trigger
   bool ejectButton; //Left Bumper
@@ -83,5 +82,8 @@ class Robot : public frc::TimedRobot
   int pivotPosition = 1; //Starting position
   bool pivotUpButton;
   bool pivotDownButton;
-
+  const double WHEELCIRCUMFERENCE = 6 * M_PI;
+  const double DISTANCEFROMSHIP = 7.5;
+  const double TICKSPERROT = 1440; //Tested value
+  const double TICKSTOTRAVEL = (DISTANCEFROMSHIP/WHEELCIRCUMFERENCE) * TICKSPERROT; //Ticks traveled for 7 1/2 inches
 };
