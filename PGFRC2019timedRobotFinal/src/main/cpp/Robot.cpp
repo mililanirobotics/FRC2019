@@ -19,6 +19,7 @@ double EJECTROLLERPOWER = 1.0; //Full power
 
 void Robot::RobotInit()
 {
+
 }
 
 /**
@@ -31,36 +32,21 @@ void Robot::RobotInit()
  */
 void Robot::RobotPeriodic()
 {
+
 }
 
-/**
- * This autonomous (along with the chooser code above) shows how to select
- * between different autonomous modes using the dashboard. The sendable chooser
- * code works with the Java SmartDashboard. If you prefer the LabVIEW Dashboard,
- * remove all of the chooser code and uncomment the GetString line to get the
- * auto name from the text box below the Gyro.
- *
- * You can add additional auto modes by adding additional comparisons to the
- * if-else structure below with additional strings. If using the SendableChooser
- * make sure to add them to the chooser code above as well.
- */
 void Robot::AutonomousInit()
 {
 
-  ///@todo Lon  Remove these unsued code, chooser, autoselected, etc.    
-  
-  driveInit();
+  TeleopInit();
 
-  //TeleopInit();
 }
 
 void Robot::AutonomousPeriodic()
 {
-  ///@todo Lon you need to run code during autonomous
   
-  //RFront.Set(ControlMode::Position, 1440);
- 
-  //TeleopPeriodic();
+  TeleopPeriodic();
+
 }
 void Robot::rollerInit()
 {
@@ -80,7 +66,8 @@ void Robot::hatchInit()
 
 void Robot::pivotInit()
 {
-
+  
+  pivotPosition = 1;
   pivotTalon.ConfigPeakOutputForward(1.0, 10); //Max roller power forward = 1.0
   pivotTalon.ConfigPeakOutputReverse(-1.0, 10); //Max pivot power reverse = -1.0
   pivotTalon.SetNeutralMode(NeutralMode::Brake); //brakes when power = 0
@@ -92,31 +79,34 @@ void Robot::setFollowers()
 {
   //Follows talon with canID 12, LFront
   LBack.Set(ControlMode::Follower, 12); 
-  LMiddle.Set(ControlMode::Follower, 12);
   //Follows talon with canID 13, RFront
   RBack.Set(ControlMode::Follower, 13);
-  RMiddle.Set(ControlMode::Follower, 13);
-
 }
 
 void Robot::driveInit()
 
 {
 
+  RFront.SetSelectedSensorPosition(0, 0, 10);
+  LFront.SetSelectedSensorPosition(0, 0, 10);
+
   RFront.ConfigPeakOutputForward(1.0, 10);
 	RFront.ConfigPeakOutputReverse(-1.0, 10);	//Sets RFront to power range -1.0 to 1.0
   RFront.ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
   RFront.SetNeutralMode(NeutralMode::Brake); //Brakes when power is 0
-	// RFront.Config_kP(0, 5.25, 10);
-  // RFront.Config_kI(0, 0, 10);
-  // RFront.Config_kD(0, 0, 10); //PID values
+	RFront.Config_kP(0, 5.25, 10);
+  RFront.Config_kI(0, 0, 10);
+  RFront.Config_kD(0, 0, 10); //PID values
 
   LFront.ConfigPeakOutputForward(1.0, 10);
 	LFront.ConfigPeakOutputReverse(-1.0, 10);	//Sets LFront to power range -1.0 to 1.0
 	LFront.ConfigSelectedFeedbackSensor(FeedbackDevice::QuadEncoder, 0, 10);
   LFront.SetNeutralMode(NeutralMode::Brake); //Brakes when power is 0
   setFollowers(); //Sets motors to follow RFront and LFront
-
+  LFront.Config_kP(0, 5.25, 10);
+  LFront.Config_kI(0, 0, 10);
+  LFront.Config_kD(0, 0, 10);
+  //TODO Lfront PID
 }
 
 void Robot::TeleopInit()
@@ -130,9 +120,6 @@ void Robot::TeleopInit()
 
   driveInit(); //Links back to function that sets power limitations and followers
 
-  RFront.SetSelectedSensorPosition(0, 0, 10);
-
-  LFront.SetSelectedSensorPosition(0, 0, 10);
   
   timer.Start(); //timer for camera
 }
@@ -169,6 +156,7 @@ void Robot::rollerPeriodic()
 
 void Robot::shootHatch()
 {
+
     topFinger.Set(true); //Opens the top fingers
     bottomFinger.Set(true); //Opens the bottom fingers
     frc::Wait(0.02); //Delay to prevent hatch from hitting the fingers
@@ -188,7 +176,9 @@ void Robot::hatchPeriodic()
   openButton = gamePad1.GetRawButton(7); //Select  
   if (ejectButton) //Checks to see if Left Bumper is pressed
   {
+
     shootHatch();
+  
   } //Left Bumper pressed, L's open and pusher is extended, then retracted
 
   else if (grabButton) //Checks to see if Right Bumper is pressed
@@ -206,7 +196,7 @@ void Robot::hatchPeriodic()
     bottomFinger.Set(true);
   
   } //if Select is pressed, L's are opened without the pusher
-///@todo Lon you sure you don't need a hidden(hard to execute) way of just opening the fingers?
+
 }
 bool Robot::inRange(int targetDegrees, double currentDegrees, double errorMargin)
 {
@@ -228,22 +218,25 @@ bool Robot::inRange(int targetDegrees, double currentDegrees, double errorMargin
 }
 void Robot::goToRange(int targetValue, double currentValue, double errorValue)
 { //Pivots to the range
-    if (!inRange(targetValue, currentValue, errorValue) && currentValue < targetValue) //Checks if it's past the angle
+
+    if (!inRange(targetValue, currentValue, errorValue) 
+    && currentValue < targetValue) //Checks if it's past the angle
     {
 
       pivotBrake.Set(frc::DoubleSolenoid::Value::kForward); 
       pivotTalon.Set(ControlMode::PercentOutput, -1.0); 
-      //Pivots downward 
+      //Pivots downward
     }
 
-    else if (!inRange(targetValue, currentValue, errorValue) && currentValue > targetValue)
+    else if (!inRange(targetValue, currentValue, errorValue) 
+    && currentValue > targetValue)
     {
 
       pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
       pivotTalon.Set(ControlMode::PercentOutput, 1.0);
       //Pivots upward
     }
-
+  
     else
     {
 
@@ -256,8 +249,8 @@ void Robot::goToRange(int targetValue, double currentValue, double errorValue)
 void Robot::pivotPeriodic()
 {
 
-  //Bigger number position, lower actual position
-  ///@todo Lon Move this to smartdashboard
+  //The larger the number is, the further out the pivot is and vice-versa
+  std::cout << "Position: " << pivotPosition << std::endl;
   frc::SmartDashboard::PutNumber("Position", pivotPosition);
   pivotDownButton = gamePad1.GetRawButtonPressed(1); //A
   pivotUpButton = gamePad1.GetRawButtonPressed(4); //Y
@@ -266,40 +259,40 @@ void Robot::pivotPeriodic()
 
   if (pivotUpButton && pivotPosition != 1)
   { 
-    ///@todo Lon this requires you to hold the button down for less than 20 ms
-    pivotPosition--; //Moves one position up
+
+    --pivotPosition; //Moves one position up
   
   }
 
   else if (pivotDownButton && pivotPosition != 4)
   {
 
-    pivotPosition++; //Moves one position down
+    ++pivotPosition; //Moves one position down
   
   }
 
   if (pivotPosition == 1) //Goes to starting position
   {
-    ///@todo Lon this code pattern shows up more than once, should make a function
-    goToRange(0, angleDegrees, 3.5);
+
+    goToRange(0, angleDegrees, 10);
+
   }
   else if (pivotPosition == 2) //Goes to 30 degrees past starting position
   {
 
-    goToRange(-30, angleDegrees, 3.5);
+    goToRange(30, angleDegrees, 10);
 
   }
   else if (pivotPosition == 3) //Goes to 54 degrees past starting position
 	{
 
-		goToRange(-54, angleDegrees, 3.5);
-    ///@todo Lon missing 0 power
+		goToRange(54, angleDegrees, 10);
 	
   }
 	else if (pivotPosition == 4) //Goes to 137 degrees past starting position
 	{
 
-		goToRange(-137, angleDegrees, 3.5);
+		goToRange(137, angleDegrees, 10);
 	
   }
 
@@ -307,19 +300,26 @@ void Robot::pivotPeriodic()
 
 void Robot::drivePeriodic()
 {
+
   double leftJoystickPower = -joystickL.GetY();								//Gets y value of left joystick
-	double rightJoystickPower = joystickR.GetY();								//Gets y value of right joystick
-	if (joystickL.GetRawButton(1) || joystickR.GetRawButton(1)) //Slowmode if triggers on either joysticks are pressed
+	double rightJoystickPower = joystickR.GetY();	  						//Gets y value of right joystick
+	std::cout << "Right: " << rightJoystickPower << std::endl;
+  std::cout << "Left: " << leftJoystickPower << std::endl;
+  if (joystickL.GetRawButton(1) || joystickR.GetRawButton(1)) //Slowmode if triggers on either joysticks are pressed
 	{
+
 		rightJoystickPower *= 0.7;
 		leftJoystickPower *= 0.7; //70% power for slowmode
-	}
+	
+  }
 	RFront.Set(ControlMode::PercentOutput, rightJoystickPower); //Sets power to y axis of joysticks
 	LFront.Set(ControlMode::PercentOutput, leftJoystickPower);
+
 }
 
 void Robot::cameraAlign()
 {
+
   auto inst = nt::NetworkTableInstance::GetDefault();
 	auto table = inst.GetTable("limelight");
 
@@ -332,52 +332,65 @@ void Robot::cameraAlign()
 	double offsetAdjust = fabs(targetOffsetAngle_Horitzontal * 0.03);
 	if (targetOffsetAngle_Horitzontal < 0)
 	{
-		RFront.Set(ControlMode::PercentOutput, -0.3);
+	
+  	RFront.Set(ControlMode::PercentOutput, -0.3);
 		LFront.Set(ControlMode::PercentOutput, 0.3 - offsetAdjust);
-	}
+	
+  }
 	else if (targetOffsetAngle_Horitzontal > 0)
 	{
+
 		RFront.Set(ControlMode::PercentOutput, -0.3 + offsetAdjust);
 		LFront.Set(ControlMode::PercentOutput, 0.3);
-	}
+	
+  }
 	else
 	{
+
 		RFront.Set(ControlMode::PercentOutput, -0.3);
 		LFront.Set(ControlMode::PercentOutput, 0.3);
-	}
+	
+  }
 
 }
 
 void Robot::cameraPeriodicHatch()
 {
+
   cameraAlign(); 
   if (timer.Get() > 1 && RFront.GetSelectedSensorVelocity() == 0 && LFront.GetSelectedSensorVelocity() == 0)
 	  { //Checks if velocity is 0
       //Timer needed because Robot starts with 0 velocity
       
-      ///@todo Lon write a function to shoot and use it in both places
 		  shootHatch();
-      ///@todo Lon where is position 30?  you should probably zero the position first
-	} //Opens L's, ejects pusher, then retracts it
+	
+  } //Opens L's, ejects pusher, then retracts it
+
 }
 
 void Robot::cameraPeriodicCargo()
 {
+
   cameraAlign();
   double angleRadians = atan2(pivotAccel.GetX(), pivotAccel.GetY()); //Grabs angle in radians
   double angleDegrees = angleRadians * (180/M_PI); //Converts angle to degrees
   if (timer.Get() > 1 && RFront.GetSelectedSensorVelocity() == 0 && LFront.GetSelectedSensorVelocity() == 0)
 	{
+
     if (TICKSTOTRAVEL - 19 < -RFront.GetSelectedSensorPosition() && TICKSTOTRAVEL + 19 > -RFront.GetSelectedSensorPosition())
     {
+
       RFront.Set(ControlMode::Position, -TICKSTOTRAVEL);
       LFront.Set(ControlMode::Position, TICKSTOTRAVEL);
     //If statment to check if RFront is in the range, 19 ticks is about 1/4th of an inch
+    
     }
     else
     {
+
       RFront.Set(ControlMode::PercentOutput, 0);
       LFront.Set(ControlMode::PercentOutput, 0);
+    
     }
     //Moving back 7 1/2 inches
     goToRange(-30, angleDegrees, 3.5);
@@ -389,9 +402,10 @@ void Robot::cameraPeriodicCargo()
 
 void Robot::emergencyPeriodic()
 { //In case of packet loss
+
   while (emergencyStop.Get() == 1)
   {
-    ///@todo Lon if you're going to print, put a delay in here
+
     std::cout << "Stopped" << std::endl; //Prints continuously
     frc::Wait(0.1);
     RFront.Set(ControlMode::PercentOutput, 0); //Stops all right motors
@@ -400,7 +414,9 @@ void Robot::emergencyPeriodic()
     rollerTalon.Set(ControlMode::PercentOutput, 0); //Stops the roller motor
     pivotTalon.Set(ControlMode::PercentOutput, 0); //Stops the pivot motor
     timer.Stop(); //Stops the timer
+  
   }//DO NOT DISABLE WHILE EMERGENCY STOP IS TRUE
+
 }
 
 
@@ -408,29 +424,41 @@ void Robot::emergencyPeriodic()
 
 void Robot::TeleopPeriodic()
 {
+
   auto inst = nt::NetworkTableInstance::GetDefault();
 	auto table = inst.GetTable("limelight");
 
-  if (joystickR.GetRawButton(2) || joystickL.GetRawButton(2))
+  if (joystickR.GetRawButton(4))
   {
-    cameraPeriodicHatch(); //Links back to camera code
-  }
-  else if (joystickR.GetRawButton(3) || joystickL.GetRawButton(3))
-  {
-    cameraPeriodicCargo();
-  }
-  else if (joystickL.GetRawButton(10) || joystickR.GetRawButton(10))
-  {
-    timer.Reset();
 
-    inst.GetTable("limelight")->PutNumber("camMode", 0);//changes camera mode for light sensor
+    cameraPeriodicHatch(); //Links back to alignment for hatch
+  
+  }
+  else if (joystickR.GetRawButton(3))
+  {
 
-		inst.GetTable("limelight")->PutNumber("ledMode", 0);//Turns camera light on
-	
+    cameraPeriodicCargo(); //Links back to alignment for cargo
+  
+  }
+  else if (joystickR.GetRawButtonPressed(2))
+  {
+
+    timer.Reset(); //Resets so that timer only starts during camera alignment
+
+    if (cameraMode == 1)
+    {
+      cameraMode = 0;
+    }
+
+    else if (cameraMode == 0)
+    {
+      cameraMode = 1;
+    }
   }
   else
   {
-    timer.Reset();
+
+    timer.Reset(); //Resets so that timer only starts during camera alignment
 
     rollerPeriodic(); //Links back to roller code
 
@@ -440,13 +468,26 @@ void Robot::TeleopPeriodic()
 
     drivePeriodic(); //Links back to drive code and slowmode
     
-    inst.GetTable("limelight")->PutNumber("camMode", 1);
+    inst.GetTable("limelight")->PutNumber("camMode", cameraMode);//changes camera mode for light sensor
 
-    inst.GetTable("limelight")->PutNumber("ledMode", 1);
+		inst.GetTable("limelight")->PutNumber("ledMode", cameraMode);//Turns camera light on/off
     
     std::cout << "RFront: " << RFront.GetSelectedSensorPosition() << std::endl;
 
     std::cout << "LFront: " << LFront.GetSelectedSensorPosition() << std::endl;
+
+    if (joystickL.GetRawButtonPressed(5) || joystickR.GetRawButtonPressed(5))
+    {
+      pivotBrake.Set(frc::DoubleSolenoid::Value::kForward); //Forward is unbraked
+    }   
+
+    if (joystickL.GetRawButtonPressed(6) || joystickR.GetRawButtonPressed(6))
+    {
+      pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse); //Reverse is braked
+    }
+
+
+  
    // emergencyPeriodic(); //Links back to emergency stop code
   }
 
@@ -460,6 +501,8 @@ void Robot::TestPeriodic()
 #ifndef RUNNING_FRC_TESTS
 int main()
 {
+
   return frc::StartRobot<Robot>();
+
 }
 #endif

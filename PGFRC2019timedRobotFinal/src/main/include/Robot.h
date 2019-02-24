@@ -53,9 +53,9 @@ class Robot : public frc::TimedRobot
 
   //Pneumatics
   frc::Compressor compressor{0};
-  frc::Solenoid topFinger{0};
-  frc::Solenoid bottomFinger{1};
-  frc::Solenoid rightPusher{2};
+  frc::Solenoid topFinger{1};
+  frc::Solenoid bottomFinger{2};
+  frc::Solenoid rightPusher{0};
   frc::Solenoid leftPusher{3};
   frc::DoubleSolenoid pivotBrake{4, 5};
 
@@ -82,6 +82,7 @@ class Robot : public frc::TimedRobot
   int pivotPosition = 1; //Starting position
   bool pivotUpButton;
   bool pivotDownButton;
+  int cameraMode = 1;
   const double WHEELCIRCUMFERENCE = 6 * M_PI;
   const double DISTANCEFROMSHIP = 7.5;
   const double TICKSPERROT = 1440; //Tested value
