@@ -197,6 +197,18 @@ void Robot::hatchPeriodic()
   
   } //if Select is pressed, L's are opened without the pusher
 
+  if (gamePad1.GetRawButtonPressed(3))
+    {
+      rightPusher.Set(frc::DoubleSolenoid::Value::kForward);
+      leftPusher.Set(frc::DoubleSolenoid::Value::kForward);
+    } //Pushes out pusher without opening/closing L's
+
+    else if (gamePad1.GetRawButtonPressed(4))
+    {
+      rightPusher.Set(frc::DoubleSolenoid::Value::kReverse);
+      leftPusher.Set(frc::DoubleSolenoid::Value::kReverse);
+    } //Retracts pusher without opening/closing L's
+
 }
 bool Robot::inRange(int targetDegrees, double currentDegrees, double errorMargin)
 {
@@ -312,9 +324,14 @@ void Robot::drivePeriodic()
 		leftJoystickPower *= 0.7; //70% power for slowmode
 	
   }
-	RFront.Set(ControlMode::PercentOutput, rightJoystickPower); //Sets power to y axis of joysticks
-	LFront.Set(ControlMode::PercentOutput, leftJoystickPower);
-
+  if (rightJoystickPower > 0.5 || rightJoystickPower < -0.5)
+  {
+	  RFront.Set(ControlMode::PercentOutput, rightJoystickPower); //Sets power to y axis of joysticks
+  }
+  if (leftJoystickPower > 0.5 || leftJoystickPower < -0.5)
+  {
+    LFront.Set(ControlMode::PercentOutput, leftJoystickPower);
+  }
 }
 
 void Robot::cameraAlign()
@@ -364,7 +381,9 @@ void Robot::cameraPeriodicHatch()
       
 		  shootHatch();
 	
-  } //Opens L's, ejects pusher, then retracts it
+  }
+  
+  if () //Opens L's, ejects pusher, then retracts it
 
 }
 
