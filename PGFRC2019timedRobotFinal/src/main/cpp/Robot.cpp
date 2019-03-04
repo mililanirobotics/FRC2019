@@ -324,8 +324,22 @@ void Robot::drivePeriodic()
 		leftJoystickPower *= 0.7; //70% power for slowmode
 	
   }
-	RFront.Set(ControlMode::PercentOutput, rightJoystickPower); //Sets power to y axis of joysticks
-  LFront.Set(ControlMode::PercentOutput, leftJoystickPower);
+  if (rightJoystickPower > 0.05 || rightJoystickPower < -0.05)
+  {
+	  RFront.Set(ControlMode::PercentOutput, rightJoystickPower); //Sets power to y axis of joysticks
+  }
+  else
+  {
+    RFront.Set(ControlMode::PercentOutput, 0);
+  }
+  if (leftJoystickPower > 0.05 || leftJoystickPower < -0.05)
+  {
+    LFront.Set(ControlMode::PercentOutput, leftJoystickPower);
+  }
+  else
+  {
+    LFront.Set(ControlMode::PercentOutput, 0);
+  }
 }
 
 void Robot::cameraAlign()
