@@ -324,14 +324,8 @@ void Robot::drivePeriodic()
 		leftJoystickPower *= 0.7; //70% power for slowmode
 	
   }
-  if (rightJoystickPower > 0.5 || rightJoystickPower < -0.5)
-  {
-	  RFront.Set(ControlMode::PercentOutput, rightJoystickPower); //Sets power to y axis of joysticks
-  }
-  if (leftJoystickPower > 0.5 || leftJoystickPower < -0.5)
-  {
-    LFront.Set(ControlMode::PercentOutput, leftJoystickPower);
-  }
+	RFront.Set(ControlMode::PercentOutput, rightJoystickPower); //Sets power to y axis of joysticks
+  LFront.Set(ControlMode::PercentOutput, leftJoystickPower);
 }
 
 void Robot::cameraAlign()
@@ -383,7 +377,7 @@ void Robot::cameraPeriodicHatch()
 	
   }
   
-  if () //Opens L's, ejects pusher, then retracts it
+ 
 
 }
 
@@ -483,7 +477,7 @@ void Robot::TeleopPeriodic()
 
     hatchPeriodic(); //Links back to solenoid fingers and pusher code for hatch
 
-    pivotPeriodic(); //Links back to position code
+    //pivotPeriodic(); //Links back to position code
 
     drivePeriodic(); //Links back to drive code and slowmode
     

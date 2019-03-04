@@ -60,8 +60,8 @@ class Robot : public frc::TimedRobot
   frc::DoubleSolenoid pivotBrake{4, 5};
 
   //Controller Settings
-  frc::Joystick joystickL{0}; //Evan's left controller
-  frc::Joystick joystickR{1}; //Evan's right controller
+  frc::Joystick joystickL{1}; //Evan's left controller
+  frc::Joystick joystickR{0}; //Evan's right controller
   frc::Joystick gamePad1{2}; //Tariq's controller
 
   //Accelerometer
