@@ -134,7 +134,7 @@ void Robot::rollerPeriodic()
   if (rollerEjectButton > 0.1) //Checks to see if left trigger is pressed
   { //Press Left Trigger to eject cargo, constant power
 
-    rollerTalon.Set(ControlMode::PercentOutput, EJECTROLLERPOWER);//Moves the roller forward used for ejecting cargo
+    rollerTalon.Set(ControlMode::PercentOutput, rollerEjectButton);//Moves the roller forward used for ejecting cargo
   
   }
   
@@ -170,7 +170,8 @@ void Robot::shootHatch()
 
 void Robot::hatchPeriodic()
 {
-  
+  fingerOpen = gamePad1.GetRawButton(3);
+  fingerClose = gamePad1.GetRawButton(4);
   ejectButton = gamePad1.GetRawButton(5); //Left Bumper
   grabButton = gamePad1.GetRawButton(6); //Right Bumper
   openButton = gamePad1.GetRawButton(7); //Select  
@@ -196,7 +197,6 @@ void Robot::hatchPeriodic()
     bottomFinger.Set(true);
   
   } //if Select is pressed, L's are opened without the pusher
-
 }
 bool Robot::inRange(int targetDegrees, double currentDegrees, double errorMargin)
 {
@@ -218,84 +218,119 @@ bool Robot::inRange(int targetDegrees, double currentDegrees, double errorMargin
 }
 void Robot::goToRange(int targetValue, double currentValue, double errorValue)
 { //Pivots to the range
+  float upSpeed = 0.45;
+  float downSpeed = -0.30;
+  double amtOff = fabs(targetValue-currentValue);
+  if (amtOff < 25)
+  {
+    upSpeed = 0.35;
+    downSpeed = -0.27;
+  }
+  if (!inRange(targetValue, currentValue, errorValue) 
+  && currentValue < targetValue) //Checks if it's past the angle
+  {
+    pivotBrake.Set(frc::DoubleSolenoid::Value::kForward); 
+    pivotTalon.Set(ControlMode::PercentOutput, downSpeed); 
+    //Pivots downward
+  }
+  else if (!inRange(targetValue, currentValue, errorValue) 
+  && currentValue > targetValue)
+  {
+    pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+    pivotTalon.Set(ControlMode::PercentOutput, upSpeed);
+    //Pivots upward
+  }
 
-    if (!inRange(targetValue, currentValue, errorValue) 
-    && currentValue < targetValue) //Checks if it's past the angle
-    {
-
-      pivotBrake.Set(frc::DoubleSolenoid::Value::kForward); 
-      pivotTalon.Set(ControlMode::PercentOutput, -1.0); 
-      //Pivots downward
-    }
-
-    else if (!inRange(targetValue, currentValue, errorValue) 
-    && currentValue > targetValue)
-    {
-
-      pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
-      pivotTalon.Set(ControlMode::PercentOutput, 1.0);
-      //Pivots upward
-    }
-  
-    else
-    {
-
-      pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
-      pivotTalon.Set(ControlMode::PercentOutput, 0);
-
-    }
+  else
+  {
+    pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
+    pivotTalon.Set(ControlMode::PercentOutput, 0);
+  }
 
 }
 void Robot::pivotPeriodic()
 {
 
   //The larger the number is, the further out the pivot is and vice-versa
-  std::cout << "Position: " << pivotPosition << std::endl;
+  //std::cout << "Position: " << pivotPosition << std::endl;
   frc::SmartDashboard::PutNumber("Position", pivotPosition);
   pivotDownButton = gamePad1.GetRawButtonPressed(1); //A
-  pivotUpButton = gamePad1.GetRawButtonPressed(4); //Y
+  pivotUpButton = gamePad1.GetRawButtonPressed(2); //B
   double angleRadians = atan2(pivotAccel.GetX(), pivotAccel.GetY()); //Grabs angle in radians
   double angleDegrees = angleRadians * (180/M_PI); //Converts angle to degrees
 
-  if (pivotUpButton && pivotPosition != 1)
+  if (pivotUpButton && pivotPosition != 1 /*&& ((inRange(30, angleDegrees, 10) && pivotPosition == 2) || 
+  (inRange(54, angleDegrees, 15) && pivotPosition == 3) || (inRange(137, angleDegrees, 10) && pivotPosition == 4))*/)
   { 
 
     --pivotPosition; //Moves one position up
   
   }
 
-  else if (pivotDownButton && pivotPosition != 4)
+  else if (pivotDownButton && pivotPosition != 4 /*&& ((inRange(30, angleDegrees, 10) && pivotPosition == 2) || 
+  (inRange(54, angleDegrees, 15) && pivotPosition == 3) || (inRange(0, angleDegrees, 5) && pivotPosition == 1))*/)
   {
 
     ++pivotPosition; //Moves one position down
   
   }
-
-  if (pivotPosition == 1) //Goes to starting position
+  if(gamePad1.GetRawButton(1) || gamePad1.GetRawButton(2))
   {
+    if (pivotPosition == 1) //Goes to starting position
+    {
 
-    goToRange(0, angleDegrees, 10);
+      goToRange(0, angleDegrees, 8);
 
+    }
+    else if (pivotPosition == 2) //Goes to 30 degrees past starting position
+    {
+
+      goToRange(30, angleDegrees, 12);
+
+    }
+    else if (pivotPosition == 3) //Goes to 54 degrees past starting position
+    {
+
+      goToRange(54, angleDegrees, 15);
+    
+    }
+    else if (pivotPosition == 4) //Goes to 137 degrees past starting position
+    {
+
+      goToRange(130, angleDegrees, 10);
+    
+    }
+    //std::cout << angleDegrees << std::endl;
   }
-  else if (pivotPosition == 2) //Goes to 30 degrees past starting position
+  else
   {
-
-    goToRange(30, angleDegrees, 10);
-
+    pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
+    pivotTalon.Set(ControlMode::PercentOutput, 0);
+    //std::cout << angleDegrees << std::endl;
   }
-  else if (pivotPosition == 3) //Goes to 54 degrees past starting position
-	{
+}
 
-		goToRange(54, angleDegrees, 10);
-	
+void Robot::pivotTest()
+{
+  pivotUpButton = gamePad1.GetRawButton(2);
+  pivotDownButton = gamePad1.GetRawButton(1);
+  if(pivotUpButton)
+  {
+      pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+      pivotTalon.Set(ControlMode::PercentOutput, 0.5);
   }
-	else if (pivotPosition == 4) //Goes to 137 degrees past starting position
-	{
-
-		goToRange(137, angleDegrees, 10);
-	
+  else if(pivotDownButton)
+  {
+      pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
+      pivotTalon.Set(ControlMode::PercentOutput, -0.5);
   }
-
+  
+  else
+  {
+    pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
+    pivotTalon.Set(ControlMode::PercentOutput, 0);
+  }
+  
 }
 
 void Robot::drivePeriodic()
@@ -303,8 +338,8 @@ void Robot::drivePeriodic()
 
   double leftJoystickPower = -joystickL.GetY();								//Gets y value of left joystick
 	double rightJoystickPower = joystickR.GetY();	  						//Gets y value of right joystick
-	std::cout << "Right: " << rightJoystickPower << std::endl;
-  std::cout << "Left: " << leftJoystickPower << std::endl;
+	//std::cout << "Right: " << rightJoystickPower << std::endl;
+  //std::cout << "Left: " << leftJoystickPower << std::endl;
   if (joystickL.GetRawButton(1) || joystickR.GetRawButton(1)) //Slowmode if triggers on either joysticks are pressed
 	{
 
@@ -336,21 +371,21 @@ void Robot::cameraAlign()
   auto inst = nt::NetworkTableInstance::GetDefault();
 	auto table = inst.GetTable("limelight");
 
-	inst.GetTable("limelight")->PutNumber("camMode", 0);//changes camera mode for light sensor
+	inst.GetTable("limelight")->PutNumber("pipeline", 0);//changes camera mode for light sensor
 
 	inst.GetTable("limelight")->PutNumber("ledMode", 0);//Turns camera light on
 
-	double targetOffsetAngle_Horitzontal = table->GetNumber("tx", 0.0);
-	std::cout << targetOffsetAngle_Horitzontal << std::endl;
-	double offsetAdjust = fabs(targetOffsetAngle_Horitzontal * 0.03);
-	if (targetOffsetAngle_Horitzontal < 0)
+	double targetOffsetAngle_Horizontal = table->GetNumber("tx", 0.0);
+	//std::cout << targetOffsetAngle_Horizontal << std::endl;
+	double offsetAdjust = fabs(targetOffsetAngle_Horizontal * 0.03);
+	if (targetOffsetAngle_Horizontal < 0)
 	{
 	
   	RFront.Set(ControlMode::PercentOutput, -0.3);
 		LFront.Set(ControlMode::PercentOutput, 0.3 - offsetAdjust);
 	
   }
-	else if (targetOffsetAngle_Horitzontal > 0)
+	else if (targetOffsetAngle_Horizontal > 0)
 	{
 
 		RFront.Set(ControlMode::PercentOutput, -0.3 + offsetAdjust);
@@ -366,6 +401,7 @@ void Robot::cameraAlign()
   }
 
 }
+
 
 void Robot::cameraPeriodicHatch()
 {
@@ -419,7 +455,7 @@ void Robot::emergencyPeriodic()
   while (emergencyStop.Get() == 1)
   {
 
-    std::cout << "Stopped" << std::endl; //Prints continuously
+    //std::cout << "Stopped" << std::endl; //Prints continuously
     frc::Wait(0.1);
     RFront.Set(ControlMode::PercentOutput, 0); //Stops all right motors
     LFront.Set(ControlMode::PercentOutput, 0); //Stops all left motors
@@ -478,16 +514,18 @@ void Robot::TeleopPeriodic()
     hatchPeriodic(); //Links back to solenoid fingers and pusher code for hatch
 
     pivotPeriodic(); //Links back to position code
+    //PivotTest();
 
     drivePeriodic(); //Links back to drive code and slowmode
     
-    inst.GetTable("limelight")->PutNumber("camMode", cameraMode);//changes camera mode for light sensor
+    inst.GetTable("limelight")->PutNumber("pipeline", cameraMode);//changes camera mode for light sensor
+    //Driver mode 1 means that LED should be off
 
 		inst.GetTable("limelight")->PutNumber("ledMode", cameraMode);//Turns camera light on/off
     
-    std::cout << "RFront: " << RFront.GetSelectedSensorPosition() << std::endl;
+    //std::cout << "RFront: " << RFront.GetSelectedSensorPosition() << std::endl;
 
-    std::cout << "LFront: " << LFront.GetSelectedSensorPosition() << std::endl;
+    //std::cout << "LFront: " << LFront.GetSelectedSensorPosition() << std::endl;
 
     if (joystickL.GetRawButtonPressed(5) || joystickR.GetRawButtonPressed(5))
     {

@@ -25,6 +25,7 @@ class Robot : public frc::TimedRobot
   void TeleopPeriodic() override;
   void TestPeriodic() override;
   void pivotInit();
+  void pivotTest();
   void pivotPeriodic();
   void rollerInit();
   void rollerPeriodic();
