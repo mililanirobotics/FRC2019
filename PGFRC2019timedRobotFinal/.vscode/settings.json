@@ -15,5 +15,6 @@
   "wpilib.online": true,
   "files.associations": {
     "cmath": "cpp"
-  }
+  },
+  "wpilib.autoStartRioLog": true
 }

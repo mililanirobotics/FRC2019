@@ -106,7 +106,6 @@ void Robot::driveInit()
   LFront.Config_kP(0, 5.25, 10);
   LFront.Config_kI(0, 0, 10);
   LFront.Config_kD(0, 0, 10);
-  //TODO Lfront PID
 }
 
 void Robot::TeleopInit()
@@ -170,8 +169,6 @@ void Robot::shootHatch()
 
 void Robot::hatchPeriodic()
 {
-  fingerOpen = gamePad1.GetRawButton(3);
-  fingerClose = gamePad1.GetRawButton(4);
   ejectButton = gamePad1.GetRawButton(5); //Left Bumper
   grabButton = gamePad1.GetRawButton(6); //Right Bumper
   openButton = gamePad1.GetRawButton(7); //Select  
@@ -218,26 +215,27 @@ bool Robot::inRange(int targetDegrees, double currentDegrees, double errorMargin
 }
 void Robot::goToRange(int targetValue, double currentValue, double errorValue)
 { //Pivots to the range
-  float upSpeed = 0.45;
-  float downSpeed = -0.30;
+  float upSpeed = 0.45/4;
+  float downSpeed = -0.30/4;
   double amtOff = fabs(targetValue-currentValue);
-  if (amtOff < 25)
-  {
-    upSpeed = 0.35;
-    downSpeed = -0.27;
-  }
+  double offSetAdjustDown = (amtOff * 0.01);
+  double offSetAdjustUp = (amtOff * 0.02);
+  
   if (!inRange(targetValue, currentValue, errorValue) 
   && currentValue < targetValue) //Checks if it's past the angle
   {
     pivotBrake.Set(frc::DoubleSolenoid::Value::kForward); 
-    pivotTalon.Set(ControlMode::PercentOutput, downSpeed); 
+    pivotTalon.Set(ControlMode::PercentOutput, downSpeed - offSetAdjustDown); 
+    std::cout << "going down: " << downSpeed - offSetAdjustDown << std::endl;
+
     //Pivots downward
   }
   else if (!inRange(targetValue, currentValue, errorValue) 
   && currentValue > targetValue)
   {
     pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
-    pivotTalon.Set(ControlMode::PercentOutput, upSpeed);
+    pivotTalon.Set(ControlMode::PercentOutput, upSpeed + offSetAdjustUp);
+    std:: cout << "going up: "<< upSpeed - offSetAdjustUp << std::endl;
     //Pivots upward
   }
 
@@ -245,6 +243,7 @@ void Robot::goToRange(int targetValue, double currentValue, double errorValue)
   {
     pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
     pivotTalon.Set(ControlMode::PercentOutput, 0);
+    std::cout << "stopped" << std::endl;
   }
 
 }
@@ -258,6 +257,9 @@ void Robot::pivotPeriodic()
   pivotUpButton = gamePad1.GetRawButtonPressed(2); //B
   double angleRadians = atan2(pivotAccel.GetX(), pivotAccel.GetY()); //Grabs angle in radians
   double angleDegrees = angleRadians * (180/M_PI); //Converts angle to degrees
+  //std::cout << "Degrees: " << angleDegrees << std::endl;
+ 
+
 
   if (pivotUpButton && pivotPosition != 1 /*&& ((inRange(30, angleDegrees, 10) && pivotPosition == 2) || 
   (inRange(54, angleDegrees, 15) && pivotPosition == 3) || (inRange(137, angleDegrees, 10) && pivotPosition == 4))*/)
@@ -279,28 +281,31 @@ void Robot::pivotPeriodic()
     if (pivotPosition == 1) //Goes to starting position
     {
 
-      goToRange(0, angleDegrees, 8);
+      goToRange(0, angleDegrees, 2);
 
     }
     else if (pivotPosition == 2) //Goes to 30 degrees past starting position
     {
 
-      goToRange(30, angleDegrees, 12);
+      goToRange(30, angleDegrees, 2);
 
     }
     else if (pivotPosition == 3) //Goes to 54 degrees past starting position
     {
 
-      goToRange(54, angleDegrees, 15);
+      goToRange(54, angleDegrees, 3);
     
     }
     else if (pivotPosition == 4) //Goes to 137 degrees past starting position
     {
 
-      goToRange(130, angleDegrees, 10);
+      goToRange(130, angleDegrees, 3);
     
     }
-    //std::cout << angleDegrees << std::endl;
+
+    // std::cout << "angle degrees: " << angleDegrees << std::endl;
+    // std::cout << "pivot position: "<< pivotPosition << std::endl;
+
   }
   else
   {
@@ -332,7 +337,22 @@ void Robot::pivotTest()
   }
   
 }
-
+/* void Robot::habPeriodic() // hab mechanism code
+{
+    double HABPOWER = 0.2; // constant for motor power
+    if (gamePad1.GetRawButton(4)) 
+    {
+      habTalon.Set(ControlMode::PercentOutput, HABPOWER); // lift the robot until hits the limit swtich
+    }
+    else if (gamePad1.GetRawButton(3))
+    {
+      habTalon.Set(ControlMode::PercentOutput, -HABPOWER); // lowers the lift
+    }
+    else 
+    {
+      habTalon.Set(ControlMode::PercentOutput, 0); // if nothing else is pressed, stops the lift
+    }
+} */
 void Robot::drivePeriodic()
 {
 
@@ -347,16 +367,19 @@ void Robot::drivePeriodic()
 		leftJoystickPower *= 0.7; //70% power for slowmode
 	
   }
-  if (rightJoystickPower > 0.05 || rightJoystickPower < -0.05)
+  if (rightJoystickPower > 0.1 || rightJoystickPower < -0.1)
   {
 	  RFront.Set(ControlMode::PercentOutput, rightJoystickPower); //Sets power to y axis of joysticks
   }
   else
   {
+
     RFront.Set(ControlMode::PercentOutput, 0);
+  
   }
-  if (leftJoystickPower > 0.05 || leftJoystickPower < -0.05)
+  if (leftJoystickPower > 0.1 || leftJoystickPower < -0.1)
   {
+
     LFront.Set(ControlMode::PercentOutput, leftJoystickPower);
   }
   else
@@ -364,6 +387,8 @@ void Robot::drivePeriodic()
     LFront.Set(ControlMode::PercentOutput, 0);
   }
 }
+
+
 
 void Robot::cameraAlign()
 {
@@ -376,28 +401,28 @@ void Robot::cameraAlign()
 	inst.GetTable("limelight")->PutNumber("ledMode", 0);//Turns camera light on
 
 	double targetOffsetAngle_Horizontal = table->GetNumber("tx", 0.0);
-	//std::cout << targetOffsetAngle_Horizontal << std::endl;
-	double offsetAdjust = fabs(targetOffsetAngle_Horizontal * 0.03);
-	if (targetOffsetAngle_Horizontal < 0)
+	std::cout << targetOffsetAngle_Horizontal << std::endl;
+	double offsetAdjust = fabs(targetOffsetAngle_Horizontal * 0.03); //changes how much the alignment adjusts by 0.02
+	if (targetOffsetAngle_Horizontal < 0) //turn left
 	{
 	
-  	RFront.Set(ControlMode::PercentOutput, -0.3);
-		LFront.Set(ControlMode::PercentOutput, 0.3 - offsetAdjust);
+  	RFront.Set(ControlMode::PercentOutput, -0.4 - offsetAdjust); // increases power of opposite side instead of decreasing power
+		LFront.Set(ControlMode::PercentOutput, 0.4 - offsetAdjust);
 	
-  }
-	else if (targetOffsetAngle_Horizontal > 0)
+  } 
+	else if (targetOffsetAngle_Horizontal > 0) //turn right
 	{
 
-		RFront.Set(ControlMode::PercentOutput, -0.3 + offsetAdjust);
-		LFront.Set(ControlMode::PercentOutput, 0.3);
+		RFront.Set(ControlMode::PercentOutput, -0.4 + offsetAdjust);
+		LFront.Set(ControlMode::PercentOutput, 0.4 + offsetAdjust); // increases power of opposite side instead of decreasing power
 	
   }
 	else
 	{
 
-		RFront.Set(ControlMode::PercentOutput, -0.3);
-		LFront.Set(ControlMode::PercentOutput, 0.3);
-	
+		RFront.Set(ControlMode::PercentOutput, -0.4);
+		LFront.Set(ControlMode::PercentOutput, 0.4); // 0.3
+
   }
 
 }
@@ -455,7 +480,7 @@ void Robot::emergencyPeriodic()
   while (emergencyStop.Get() == 1)
   {
 
-    //std::cout << "Stopped" << std::endl; //Prints continuously
+    std::cout << "Stopped" << std::endl; //Prints continuously
     frc::Wait(0.1);
     RFront.Set(ControlMode::PercentOutput, 0); //Stops all right motors
     LFront.Set(ControlMode::PercentOutput, 0); //Stops all left motors
@@ -476,7 +501,10 @@ void Robot::TeleopPeriodic()
 
   auto inst = nt::NetworkTableInstance::GetDefault();
 	auto table = inst.GetTable("limelight");
+  double targetOffset_Skew = table->GetNumber("ts", 0.0);
+  //std::cout << targetOffset_Skew << std::endl;
 
+  
   if (joystickR.GetRawButton(4))
   {
 
@@ -523,6 +551,7 @@ void Robot::TeleopPeriodic()
 
 		inst.GetTable("limelight")->PutNumber("ledMode", cameraMode);//Turns camera light on/off
     
+    //habPeriodic();
     //std::cout << "RFront: " << RFront.GetSelectedSensorPosition() << std::endl;
 
     //std::cout << "LFront: " << LFront.GetSelectedSensorPosition() << std::endl;
@@ -539,7 +568,7 @@ void Robot::TeleopPeriodic()
 
 
   
-   // emergencyPeriodic(); //Links back to emergency stop code
+  // emergencyPeriodic(); //Links back to emergency stop code
   }
 
 }

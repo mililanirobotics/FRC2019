@@ -41,6 +41,7 @@ class Robot : public frc::TimedRobot
   void cameraPeriodicCargo();
   void emergencyPeriodic();
   void shootHatch();
+  //void habPeriodic();
   
   //Talons
   TalonSRX LBack{10};
@@ -52,13 +53,14 @@ class Robot : public frc::TimedRobot
   TalonSRX rollerTalon{17}; //Intake/Output roller on cargo payload
   TalonSRX pivotTalon{16}; //talon that moves pivot
 
+
   //Pneumatics
   frc::Compressor compressor{0};
   frc::Solenoid topFinger{1};
   frc::Solenoid bottomFinger{2};
   frc::Solenoid rightPusher{0};
   frc::Solenoid leftPusher{3};
-  frc::DoubleSolenoid pivotBrake{4, 5};
+  frc::DoubleSolenoid pivotBrake{4, 5}; 
 
   //Controller Settings
   frc::Joystick joystickL{0}; //Evan's left controller
@@ -70,10 +72,6 @@ class Robot : public frc::TimedRobot
 
   //Timer
   frc::Timer timer{};
-
-  //Emergency Stop
-  frc::DigitalInput emergencyStop{9};
-
 
   double rollerEjectButton; //Left Trigger
   double rollerIntakeButton; //Right Trigger
