@@ -226,7 +226,7 @@ void Robot::goToRange(int targetValue, double currentValue, double errorValue)
   {
     pivotBrake.Set(frc::DoubleSolenoid::Value::kForward); 
     pivotTalon.Set(ControlMode::PercentOutput, downSpeed - offSetAdjustDown); 
-    std::cout << "going down: " << downSpeed - offSetAdjustDown << std::endl;
+    //std::cout << "going down: " << downSpeed - offSetAdjustDown << std::endl;
 
     //Pivots downward
   }
@@ -235,7 +235,7 @@ void Robot::goToRange(int targetValue, double currentValue, double errorValue)
   {
     pivotBrake.Set(frc::DoubleSolenoid::Value::kForward);
     pivotTalon.Set(ControlMode::PercentOutput, upSpeed + offSetAdjustUp);
-    std:: cout << "going up: "<< upSpeed - offSetAdjustUp << std::endl;
+    //std:: cout << "going up: "<< upSpeed - offSetAdjustUp << std::endl;
     //Pivots upward
   }
 
@@ -243,7 +243,8 @@ void Robot::goToRange(int targetValue, double currentValue, double errorValue)
   {
     pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
     pivotTalon.Set(ControlMode::PercentOutput, 0);
-    std::cout << "stopped" << std::endl;
+    pivotBrakeMode = true;
+    //std::cout << "stopped" << std::endl;
   }
 
 }
@@ -258,6 +259,7 @@ void Robot::pivotPeriodic()
   double angleRadians = atan2(pivotAccel.GetX(), pivotAccel.GetY()); //Grabs angle in radians
   double angleDegrees = angleRadians * (180/M_PI); //Converts angle to degrees
   //std::cout << "Degrees: " << angleDegrees << std::endl;
+  frc::SmartDashboard::PutNumber("Brake mode", pivotBrakeMode);
  
 
 
@@ -266,7 +268,7 @@ void Robot::pivotPeriodic()
   { 
 
     --pivotPosition; //Moves one position up
-  
+    pivotBrakeMode = false;
   }
 
   else if (pivotDownButton && pivotPosition != 4 /*&& ((inRange(30, angleDegrees, 10) && pivotPosition == 2) || 
@@ -274,29 +276,29 @@ void Robot::pivotPeriodic()
   {
 
     ++pivotPosition; //Moves one position down
-  
+    pivotBrakeMode = false;
   }
   if(gamePad1.GetRawButton(1) || gamePad1.GetRawButton(2))
   {
-    if (pivotPosition == 1) //Goes to starting position
+    if (pivotPosition == 1 && pivotBrakeMode == false) //Goes to starting position
     {
 
       goToRange(0, angleDegrees, 2);
 
     }
-    else if (pivotPosition == 2) //Goes to 30 degrees past starting position
+    else if (pivotPosition == 2 && pivotBrakeMode == false) //Goes to 30 degrees past starting position
     {
 
       goToRange(30, angleDegrees, 2);
 
     }
-    else if (pivotPosition == 3) //Goes to 54 degrees past starting position
+    else if (pivotPosition == 3 && pivotBrakeMode == false) //Goes to 54 degrees past starting position
     {
 
       goToRange(54, angleDegrees, 3);
     
     }
-    else if (pivotPosition == 4) //Goes to 137 degrees past starting position
+    else if (pivotPosition == 4 && pivotBrakeMode == false) //Goes to 137 degrees past starting position
     {
 
       goToRange(130, angleDegrees, 3);
@@ -311,6 +313,7 @@ void Robot::pivotPeriodic()
   {
     pivotBrake.Set(frc::DoubleSolenoid::Value::kReverse);
     pivotTalon.Set(ControlMode::PercentOutput, 0);
+
     //std::cout << angleDegrees << std::endl;
   }
 }
@@ -474,24 +477,24 @@ void Robot::cameraPeriodicCargo()
 
 }
 
-void Robot::emergencyPeriodic()
-{ //In case of packet loss
+// void Robot::emergencyPeriodic()
+// { //In case of packet loss
 
-  while (emergencyStop.Get() == 1)
-  {
+//   while (emergencyStop.Get() == 1)
+//   {
 
-    std::cout << "Stopped" << std::endl; //Prints continuously
-    frc::Wait(0.1);
-    RFront.Set(ControlMode::PercentOutput, 0); //Stops all right motors
-    LFront.Set(ControlMode::PercentOutput, 0); //Stops all left motors
-    compressor.SetClosedLoopControl(false); //Closes compressor
-    rollerTalon.Set(ControlMode::PercentOutput, 0); //Stops the roller motor
-    pivotTalon.Set(ControlMode::PercentOutput, 0); //Stops the pivot motor
-    timer.Stop(); //Stops the timer
+//     std::cout << "Stopped" << std::endl; //Prints continuously
+//     frc::Wait(0.1);
+//     RFront.Set(ControlMode::PercentOutput, 0); //Stops all right motors
+//     LFront.Set(ControlMode::PercentOutput, 0); //Stops all left motors
+//     compressor.SetClosedLoopControl(false); //Closes compressor
+//     rollerTalon.Set(ControlMode::PercentOutput, 0); //Stops the roller motor
+//     pivotTalon.Set(ControlMode::PercentOutput, 0); //Stops the pivot motor
+//     timer.Stop(); //Stops the timer
   
-  }//DO NOT DISABLE WHILE EMERGENCY STOP IS TRUE
+//   }//DO NOT DISABLE WHILE EMERGENCY STOP IS TRUE
 
-}
+// }
 
 
 

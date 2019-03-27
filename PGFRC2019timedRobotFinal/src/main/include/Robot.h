@@ -39,7 +39,7 @@ class Robot : public frc::TimedRobot
   void cameraAlign();
   void cameraPeriodicHatch();
   void cameraPeriodicCargo();
-  void emergencyPeriodic();
+  //void emergencyPeriodic();
   void shootHatch();
   //void habPeriodic();
   
@@ -81,6 +81,7 @@ class Robot : public frc::TimedRobot
   int pivotPosition = 1; //Starting position
   bool pivotUpButton;
   bool pivotDownButton;
+  bool pivotBrakeMode = false;
   int cameraMode = 1;
   const double WHEELCIRCUMFERENCE = 6 * M_PI;
   const double DISTANCEFROMSHIP = 7.5;
