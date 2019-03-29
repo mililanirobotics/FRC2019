@@ -133,14 +133,14 @@ void Robot::rollerPeriodic()
   if (rollerEjectButton > 0.1) //Checks to see if left trigger is pressed
   { //Press Left Trigger to eject cargo, constant power
 
-    rollerTalon.Set(ControlMode::PercentOutput, rollerEjectButton);//Moves the roller forward used for ejecting cargo
+    rollerTalon.Set(ControlMode::PercentOutput, 1);//Moves the roller forward used for ejecting cargo
   
   }
   
   else if (rollerIntakeButton > 0.1) //Checks to see if right trigger is pressed
   { //Press Right Trigger to intake cargo, controllable power depending on how much you press it
 
-    rollerTalon.Set(ControlMode::PercentOutput, -rollerIntakeButton);//Moves the roller backward used for intake cargo
+    rollerTalon.Set(ControlMode::PercentOutput, -1);//Moves the roller backward used for intake cargo
   
   }
   
@@ -216,10 +216,10 @@ bool Robot::inRange(int targetDegrees, double currentDegrees, double errorMargin
 void Robot::goToRange(int targetValue, double currentValue, double errorValue)
 { //Pivots to the range
   float upSpeed = 0.45/4;
-  float downSpeed = -0.30/4;
+  float downSpeed = -0.4/4;
   double amtOff = fabs(targetValue-currentValue);
-  double offSetAdjustDown = (amtOff * 0.01);
-  double offSetAdjustUp = (amtOff * 0.02);
+  double offSetAdjustDown = (amtOff * 0.008);
+  double offSetAdjustUp = (amtOff * 0.01);
   
   if (!inRange(targetValue, currentValue, errorValue) 
   && currentValue < targetValue) //Checks if it's past the angle
@@ -283,13 +283,13 @@ void Robot::pivotPeriodic()
     if (pivotPosition == 1 && pivotBrakeMode == false) //Goes to starting position
     {
 
-      goToRange(0, angleDegrees, 2);
+      goToRange(0, angleDegrees, 3);
 
     }
     else if (pivotPosition == 2 && pivotBrakeMode == false) //Goes to 30 degrees past starting position
     {
 
-      goToRange(30, angleDegrees, 2);
+      goToRange(30, angleDegrees, 3);
 
     }
     else if (pivotPosition == 3 && pivotBrakeMode == false) //Goes to 54 degrees past starting position
@@ -301,7 +301,7 @@ void Robot::pivotPeriodic()
     else if (pivotPosition == 4 && pivotBrakeMode == false) //Goes to 137 degrees past starting position
     {
 
-      goToRange(130, angleDegrees, 3);
+      goToRange(132, angleDegrees, 3);
     
     }
 
@@ -404,7 +404,7 @@ void Robot::cameraAlign()
 	inst.GetTable("limelight")->PutNumber("ledMode", 0);//Turns camera light on
 
 	double targetOffsetAngle_Horizontal = table->GetNumber("tx", 0.0);
-	std::cout << targetOffsetAngle_Horizontal << std::endl;
+	//std::cout << targetOffsetAngle_Horizontal << std::endl;
 	double offsetAdjust = fabs(targetOffsetAngle_Horizontal * 0.03); //changes how much the alignment adjusts by 0.02
 	if (targetOffsetAngle_Horizontal < 0) //turn left
 	{
